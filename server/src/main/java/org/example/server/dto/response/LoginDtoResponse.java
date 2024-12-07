@@ -1,9 +1,15 @@
 package org.example.server.dto.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class UserDtoResponse {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoginDtoResponse {
 
     private Long id;
     private String firstName;
@@ -12,5 +18,6 @@ public class UserDtoResponse {
     private String position;
     private String createdAt;
     private String updatedAt;
+    private String token;
 
 }
