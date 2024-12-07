@@ -1,9 +1,9 @@
 package org.example.server.controller;
 
+import jakarta.validation.Valid;
 import org.example.server.dto.request.UserDtoRequest;
 import org.example.server.dto.response.UserDtoResponse;
 import org.example.server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserDtoResponse> createUser(@RequestBody UserDtoRequest userDtoRequest) {
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserDtoResponse> createUser(@Valid @RequestBody UserDtoRequest userDtoRequest) {
         return ResponseEntity.ok(userService.createUser(userDtoRequest));
     }
 

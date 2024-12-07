@@ -22,7 +22,7 @@ public class UserMapper {
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
-        response.setPosition(user.getPosition());
+        response.setPosition(String.valueOf(user.getPosition()));
         response.setCreatedAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null);
         response.setUpdatedAt(user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null);
         return response;
