@@ -6,9 +6,11 @@ import org.example.server.exception.InvalidCredentialsException;
 import org.example.server.model.User;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.LoginService;
-import org.example.server.utils.JwtTokenUtil;
+import org.example.server.security.JwtTokenUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -23,6 +25,7 @@ public class LoginServiceImpl implements LoginService {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
+    @Override
     public LoginDtoResponse login(LoginDtoRequest loginRequest) {
 
         User user = userRepository.findByEmail(loginRequest.getEmail())
@@ -32,6 +35,8 @@ public class LoginServiceImpl implements LoginService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
         return LoginDtoResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
@@ -40,7 +45,7 @@ public class LoginServiceImpl implements LoginService {
                 .position(String.valueOf(user.getPosition()))
                 .createdAt(String.valueOf(user.getCreatedAt()))
                 .updatedAt(String.valueOf(user.getUpdatedAt()))
-                .token(jwtTokenUtil.generateToken(user.getEmail()))
+                .token(jwtTokenUtil.generateToken(user.getEmail(), user.getId()))
                 .build();
     }
 }

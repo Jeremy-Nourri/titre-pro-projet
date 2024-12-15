@@ -5,7 +5,7 @@ import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.impl.LoginServiceImpl;
-import org.example.server.utils.JwtTokenUtil;
+import org.example.server.security.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,7 +47,7 @@ class LoginServiceTest {
 
         when(userRepository.findByEmail(loginRequest.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
-        when(jwtTokenUtil.generateToken(user.getEmail())).thenReturn("mockJwtToken");
+        when(jwtTokenUtil.generateToken(user.getEmail(), user.getId())).thenReturn("mockJwtToken");
 
         LoginDtoResponse response = loginService.login(loginRequest);
 
