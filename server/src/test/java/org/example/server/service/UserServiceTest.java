@@ -58,6 +58,6 @@ class UserServiceTest {
         assertEquals("John", response.getFirstName());
         assertEquals("Doe", response.getLastName());
         assertEquals("john@doe.com", response.getEmail());
-        assertEquals(PositionEnum.DEVELOPER, response.getPosition());
+        assertEquals(PositionEnum.DEVELOPER.name(), response.getPosition());
     }
 }
