@@ -2,8 +2,11 @@ package org.example.server.mapper;
 
 import org.example.server.dto.request.UserDtoRequest;
 import org.example.server.dto.response.UserDtoResponse;
+import org.example.server.dto.response.UserSimplifiedDtoResponse;
 import org.example.server.model.PositionEnum;
 import org.example.server.model.User;
+
+import java.util.stream.Collectors;
 
 public class UserMapper {
     public static User mapUserDtoRequestToUser(UserDtoRequest request) {
@@ -25,6 +28,24 @@ public class UserMapper {
         response.setPosition(String.valueOf(user.getPosition()));
         response.setCreatedAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null);
         response.setUpdatedAt(user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null);
+        if (user.getUserProjects() != null) {
+            response.setUserProjects(user.getUserProjects().stream()
+                    .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)
+                    .collect(Collectors.toList()));
+        }
         return response;
+    }
+
+    public static UserSimplifiedDtoResponse toSimplifiedDto(User user) {
+        if (user == null) {
+            return null;
+        }
+
+        UserSimplifiedDtoResponse dto = new UserSimplifiedDtoResponse();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 }
