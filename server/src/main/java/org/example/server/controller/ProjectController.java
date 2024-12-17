@@ -35,19 +35,15 @@ public class ProjectController {
     public ResponseEntity<Project> updateProject(
             @PathVariable Long projectId,
             @Valid @RequestBody ProjectDtoRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails currentUser = (UserDetails) authentication.getPrincipal();
 
-        Project updatedProject = projectService.updateProject(projectId, request, currentUser);
+        Project updatedProject = projectService.updateProject(projectId, request);
         return ResponseEntity.ok(updatedProject);
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails currentUser = (UserDetails) authentication.getPrincipal();
 
-        projectService.deleteProject(projectId, currentUser);
+        projectService.deleteProject(projectId);
         return ResponseEntity.noContent().build();
     }
 }

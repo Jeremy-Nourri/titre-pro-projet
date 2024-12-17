@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ProjectService {
     Project createProject(ProjectDtoRequest request, UserDetails currentUser);
-    Project updateProject(Long projectId, ProjectDtoRequest request, UserDetails currentUser);
-    boolean deleteProject(Long projectId, UserDetails currentUser);
+    Project updateProject(Long projectId, ProjectDtoRequest request);
+    boolean deleteProject(Long projectId);
 }
 

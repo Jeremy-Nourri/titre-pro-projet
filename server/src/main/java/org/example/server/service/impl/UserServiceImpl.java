@@ -7,7 +7,6 @@ import org.example.server.mapper.UserMapper;
 import org.example.server.model.User;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
