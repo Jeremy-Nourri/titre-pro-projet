@@ -3,6 +3,7 @@ package org.example.server.service.impl;
 import org.example.server.dto.request.UserDtoRequest;
 import org.example.server.dto.response.UserDtoResponse;
 import org.example.server.exception.EmailExistsException;
+import org.example.server.exception.UserNotFoundException;
 import org.example.server.mapper.UserMapper;
 import org.example.server.model.User;
 import org.example.server.repository.UserRepository;
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoResponse getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return UserMapper.mapUserToUserDtoResponse(user);
     }
 }

@@ -37,14 +37,17 @@ public class LoginServiceImpl implements LoginService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
+        String formattedCreatedAt = user.getCreatedAt() != null ? user.getCreatedAt().format(formatter) : null;
+        String formattedUpdatedAt = user.getUpdatedAt() != null ? user.getUpdatedAt().format(formatter) : null;
+
         return LoginDtoResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .position(String.valueOf(user.getPosition()))
-                .createdAt(String.valueOf(user.getCreatedAt()))
-                .updatedAt(String.valueOf(user.getUpdatedAt()))
+                .createdAt(formattedCreatedAt)
+                .updatedAt(formattedUpdatedAt)
                 .token(jwtTokenUtil.generateToken(user.getEmail(), user.getId()))
                 .build();
     }

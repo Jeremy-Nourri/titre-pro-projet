@@ -133,15 +133,14 @@ public class TaskServiceTest {
     }
 
     @Test
-    void testDeleteTask_Success() {
-        when(taskRepository.findById(1L))
-                .thenReturn(Optional.of(mockTask))
-                .thenReturn(Optional.empty());
+    void testDeleteTask_TaskNotFound() {
 
-        boolean result = taskService.deleteTask(1L);
+        when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertFalse(result);
-        verify(taskRepository, times(1)).delete(mockTask);
+        assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(1L));
+
+        verify(taskRepository, times(1)).findById(1L);
+        verify(taskRepository, never()).delete(any(Task.class));
     }
 
     @Test

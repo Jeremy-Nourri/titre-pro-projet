@@ -46,4 +46,11 @@ public class ProjectController {
         projectService.deleteProject(projectId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{projectId}/users/{userId}")
+    public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @PathVariable Long userId) {
+        projectService.addUserToProject(projectId, userId);
+        return ResponseEntity.ok("Utilisateur ajouté avec succès au projet.");
+    }
+
 }

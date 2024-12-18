@@ -66,16 +66,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @CheckProjectAuthorization
-    public boolean deleteTask(Long taskId) {
+    public void deleteTask(Long taskId) {
 
         Task existingTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Tâche non trouvée avec ID : " + taskId));
 
         taskRepository.delete(existingTask);
-
-        Optional<Task> taskFound = taskRepository.findById(taskId);
-
-        return taskFound.isPresent();
     }
 
     @Override

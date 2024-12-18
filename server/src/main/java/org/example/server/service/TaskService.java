@@ -11,7 +11,7 @@ public interface TaskService {
 
     Task updateTask(Long taskId, TaskDtoRequest request);
 
-    boolean deleteTask(Long taskId);
+    void deleteTask(Long taskId);
 
     List<Task> getTasksByProject(Long projectId);
 

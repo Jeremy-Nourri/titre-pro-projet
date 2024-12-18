@@ -64,15 +64,11 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @CheckProjectAuthorization
-    public boolean deleteTag(Long id) {
+    public void deleteTag(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new TagNotFoundException("Tag non trouvé avec l'id : " + id));
 
         tagRepository.delete(tag);
-
-        Optional<Tag> tagFound = tagRepository.findById(id);
-
-        return tagFound.isPresent();
     }
 
     @Override
