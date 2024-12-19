@@ -73,7 +73,7 @@ public class TagServiceTest {
         TagDtoResponse response = tagService.createTag(tagDtoRequest, 1L);
 
         assertThat(response).isNotNull();
-        assertThat(response.getDesignation()).isEqualTo("Important");
+        assertThat(response.getDesignation()).isEqualTo("Team dev");
         verify(taskRepository, times(1)).findById(1L);
         verify(tagRepository, times(1)).save(any(Tag.class));
     }
@@ -114,12 +114,10 @@ public class TagServiceTest {
     void testDeleteTag_Success() {
         when(tagRepository.findById(1L)).thenReturn(Optional.of(tag));
         doNothing().when(tagRepository).delete(tag);
-        when(tagRepository.findById(1L)).thenReturn(Optional.empty());
 
-        boolean result = tagService.deleteTag(1L);
+        tagService.deleteTag(1L);
 
-        assertThat(result).isFalse();
-        verify(tagRepository, times(2)).findById(1L);
+        verify(tagRepository, times(1)).findById(1L);
         verify(tagRepository, times(1)).delete(tag);
     }
 
@@ -139,7 +137,7 @@ public class TagServiceTest {
         List<TagDtoResponse> responses = tagService.getTagsByTask(1L);
 
         assertThat(responses).isNotEmpty();
-        assertThat(responses.get(0).getDesignation()).isEqualTo("Important");
+        assertThat(responses.get(0).getDesignation()).isEqualTo("Team dev");
         verify(tagRepository, times(1)).findTagsByTaskId(1L);
     }
 

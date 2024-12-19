@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -17,7 +18,10 @@ public class JwtTokenUtil {
     private final long expirationTime;
 
     public JwtTokenUtil(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long expirationTime) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT secret must be at least 32 characters long");
+        }
+        this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
         this.expirationTime = expirationTime;
     }
 
@@ -48,4 +52,3 @@ public class JwtTokenUtil {
         }
     }
 }
-

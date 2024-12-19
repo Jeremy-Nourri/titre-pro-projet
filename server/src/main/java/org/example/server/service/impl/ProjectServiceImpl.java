@@ -4,8 +4,11 @@ import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.ProjectDtoRequest;
 import org.example.server.exception.InvalidProjectDateException;
 import org.example.server.exception.ProjectNotFoundException;
+import org.example.server.exception.UserAlreadyAssignedException;
+import org.example.server.exception.UserNotFoundException;
 import org.example.server.model.Project;
 import org.example.server.model.User;
+import org.example.server.model.UserProject;
 import org.example.server.repository.ProjectRepository;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.ProjectService;
@@ -70,15 +73,39 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @CheckProjectAuthorization
-    public boolean deleteProject(Long projectId) {
+    public void deleteProject(Long projectId) {
 
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
         projectRepository.delete(existingProject);
+    }
 
-        Optional<Project> projectFound = projectRepository.findById(projectId);
+    @Override
+    @CheckProjectAuthorization
+    public void addUserToProject(Long projectId, Long userId) {
 
-        return projectFound.isPresent();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec ID " + userId + " non trouvé"));
+
+        boolean userAlreadyAssigned = project.getUserProjects().stream()
+                .anyMatch(userProject -> userProject.getUser().getId().equals(userId));
+
+        if (userAlreadyAssigned) {
+            throw new UserAlreadyAssignedException("L'utilisateur est déjà assigné à ce projet.");
+        }
+
+        UserProject userProject = UserProject.builder()
+                .user(user)
+                .project(project)
+                .userAddAt(LocalDate.now())
+                .build();
+
+        project.getUserProjects().add(userProject);
+
+        projectRepository.save(project);
     }
 }

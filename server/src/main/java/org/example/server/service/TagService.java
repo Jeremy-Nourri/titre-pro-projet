@@ -8,6 +8,6 @@ import java.util.List;
 public interface TagService {
     TagDtoResponse createTag(TagDtoRequest tagDtoRequest, Long taskId);
     TagDtoResponse updateTag(Long taskId, Long tagId, TagDtoRequest tagDtoRequest);
-    boolean deleteTag(Long id);
+    void deleteTag(Long id);
     List<TagDtoResponse> getTagsByTask(Long taskId);
 }
