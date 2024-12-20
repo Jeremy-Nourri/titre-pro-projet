@@ -15,6 +15,10 @@
 		"types": ["vitest"],
 		"strict": true,
 		"esModuleInterop": true,
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
 	}
 }

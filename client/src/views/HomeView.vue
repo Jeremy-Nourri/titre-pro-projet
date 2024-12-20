@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+		<h1>
+			Project flow
+		</h1>
+		<p>
+			Below is a simple project flow for a web application.
+		</p>
   </main>
 </template>
