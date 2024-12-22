@@ -2,7 +2,11 @@ import { setActivePinia, createPinia } from 'pinia';
 import { describe, it, beforeEach, expect, vi } from 'vitest';
 import { useUserStore } from '@/stores/userStore';
 import { createUser } from '@/services/userService';
-import { type UserRequest, type UserResponse, Position } from '@/types/interfaces/user';
+import {
+    type UserRequest,
+    type UserResponse,
+    Position,
+} from '@/types/interfaces/user';
 
 vi.mock('@/services/userService', () => ({
     createUser: vi.fn(),
@@ -22,7 +26,7 @@ describe('User Store', () => {
             lastName: 'Doe',
             email: 'john.doe@example.com',
             password: 'password123',
-            position: Position.DEVELOPER
+            position: Position.DEVELOPER,
         };
 
         const mockResponse: UserResponse = {
@@ -37,7 +41,9 @@ describe('User Store', () => {
             userProjects: [],
         };
 
-        (createUser as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockResponse);
+        (createUser as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+            mockResponse
+        );
 
         await userStore.addUser(mockUser);
 
@@ -48,9 +54,12 @@ describe('User Store', () => {
     });
 
     it('should handle an error when adding a user', async () => {
-        const mockError = 'Requête invalide. Veuillez vérifier les données saisies.';
+        const mockError =
+            'Requête invalide. Veuillez vérifier les données saisies.';
 
-        (createUser as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockError);
+        (createUser as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+            mockError
+        );
 
         await userStore.addUser({
             firstName: '',

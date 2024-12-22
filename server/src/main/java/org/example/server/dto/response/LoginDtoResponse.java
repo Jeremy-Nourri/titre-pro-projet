@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,5 +21,9 @@ public class LoginDtoResponse {
     private String createdAt;
     private String updatedAt;
     private String token;
+
+    private List<ProjectDtoResponse> createdProjects;
+    private List<UserProjectDtoResponse> userProjects;
+
 
 }
