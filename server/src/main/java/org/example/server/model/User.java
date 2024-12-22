@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,13 +40,13 @@ public class User {
     private PositionEnum position;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserProject> userProjects;
+    private List<UserProject> userProjects = new ArrayList<>();
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private List<Task> tasks;
 
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Project> createdProjects;
+    private List<Project> createdProjects = new ArrayList<>();
 
     @CreatedDate
     private LocalDate createdAt;

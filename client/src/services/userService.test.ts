@@ -35,7 +35,7 @@ describe('User Service', () => {
         (api.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockResponse });
         const result = await createUser(mockUser);
 
-        expect(api.post).toHaveBeenCalledWith('/users', mockUser);
+        expect(api.post).toHaveBeenCalledWith('users/register', mockUser);
         expect(result).toEqual(mockResponse);
         expect(vi.mocked(handleApiError)).not.toHaveBeenCalled();
     });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid'
 import { CheckIcon } from '@heroicons/vue/20/solid'
@@ -9,9 +9,13 @@ import { Position, type UserRequest } from '@/types/interfaces/user';
 import LogoProjectFlow from '@/assets/img/logo-project-flow.webp';
 import FormInput from './ui/FormInput.vue';
 import { useUserStore } from '@/stores/userStore';
+import { error } from 'console';
+
+const emit = defineEmits<{
+  (event: 'changeComponent', component: string): void;
+}>();
 
 const userStore = useUserStore();
-
 
 const positions = Object.entries(Position).map(([value, label]) => ({ value, label }));
 
@@ -52,6 +56,9 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...userData } = values;
     await userStore.addUser(userData as UserRequest);
+    if (!userStore.error) {
+        emit('changeComponent', 'login');
+    }
 });
 
 </script>
@@ -110,6 +117,9 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
                 </div>
             </form>
         </div>
+        <button class="block mx-auto md:text-sm/6 text-[12px] text-bluecolor hover:opacity-80 ease-in duration-300 underline" @click="emit('changeComponent', 'login')" >
+            Se connecter
+        </button>
     </div>
 
 
