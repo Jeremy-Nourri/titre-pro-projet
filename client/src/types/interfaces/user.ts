@@ -14,9 +14,28 @@ export interface UserResponse {
 	firstName: string;
 	lastName: string;
 	email: string;
-	position: string;
+	position: Position;
 	createdAt: string;
 	updatedAt?: string;
 	createdProjects: ProjectResponse[];
 	userProjects: UserProjectResponse[];
+}
+
+export enum Position {
+  DEVELOPER = 'Développeur',
+  PROJECT_MANAGER = 'Chef de projet',
+  DESIGNER = 'Designer',
+  TESTER = 'Testeur',
+  DEVOPS = 'DevOps',
+  BUSINESS_ANALYST = 'Analyste métier',
+  ARCHITECT = 'Architecte',
+  MARKETING = 'Marketing',
+  PRODUCT_OWNER = 'Product Owner',
+  SCRUM_MASTER = 'Scrum Master',
+  TECHNICAL_LEAD = 'Lead Technique',
+  CEO = 'CEO',
+  CTO = 'CTO',
+  CFO = 'CFO',
+  HR_MANAGER = 'Responsable RH',
+  COMMUNICATIONS_MANAGER = 'Responsable Communication',
 }

@@ -5,10 +5,9 @@
 @tailwind utilities;
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+    margin: 0 auto;
 }
 
-
+.form-input {
+    @apply block w-full rounded-md bg-white pr-2 pl-3 py-2 text-primary outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 placeholder:md:text-sm/6 placeholder:text-[12px] md:text-sm/6 text-[12px] focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor
+}
