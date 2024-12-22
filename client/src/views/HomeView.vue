@@ -1,14 +1,10 @@
 <script setup lang="ts">
+import RegisterForm from '@/components/RegisterForm.vue';
 
 </script>
 
 <template>
-  <main>
-		<h1>
-			Project flow
-		</h1>
-		<p>
-			Below is a simple project flow for a web application.
-		</p>
-  </main>
+    <main class="bg-bluecolor p-2">
+        <RegisterForm />
+    </main>
 </template>
