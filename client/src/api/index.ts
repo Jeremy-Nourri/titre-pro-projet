@@ -12,7 +12,7 @@ export const handleApiError = (error: unknown): string => {
             case 400:
                 return "Requête invalide. Veuillez vérifier les données saisies.";
             case 401:
-                return "Non autorisé. Veuillez vous connecter.";
+                return "Non autorisé. Veuillez vérifier les données saisies.";
             case 403:
                 return "Accès refusé. Vous n'avez pas les permissions nécessaires.";
             case 404:
@@ -20,7 +20,7 @@ export const handleApiError = (error: unknown): string => {
             case 500:
                 return "Erreur interne du serveur. Veuillez réessayer plus tard.";
             default:
-                return `Erreur inconnue : ${error.response.status}. Veuillez réessayer.`;
+                return `${error.response.status}`;
             }
         }
 

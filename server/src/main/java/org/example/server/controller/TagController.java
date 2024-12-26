@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks/{taskId}/tags")
+@RequestMapping("/api/projects/{projectId}/columns/{boardColumnId}/tasks/{taskId}/tags")
 public class TagController {
 
     private final TagService tagService;

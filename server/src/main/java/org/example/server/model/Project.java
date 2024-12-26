@@ -1,5 +1,6 @@
 package org.example.server.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,13 +8,12 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Entity
 @Table(name = "project")
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"userProjects", "createdBy"})
+@ToString(exclude = {"userProjects", "createdBy", "columns"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,10 +37,15 @@ public class Project {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
+    @JsonManagedReference
     private User createdBy;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserProject> userProjects;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<BoardColumn> columns;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

@@ -9,17 +9,23 @@ export const useUserStore = defineStore('user', () => {
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
+    const resetError = () => {
+        error.value = null;
+    };
+
     const addUser = async (user: UserRequest) => {
         isLoading.value = true;
-        error.value = null;
+        resetError();
 
-        const result = await createUser(user);
-        if (typeof result === 'string') {
-            error.value = result;
+        const response = await createUser(user);
+
+        if (typeof response === 'string') {
+            error.value = response;
+
         } else {
-            users.value.push(result);
+            users.value.push(response);
         }
-
+        
         isLoading.value = false;
     };
 
@@ -28,5 +34,6 @@ export const useUserStore = defineStore('user', () => {
         isLoading,
         error,
         addUser,
+        resetError
     };
 });

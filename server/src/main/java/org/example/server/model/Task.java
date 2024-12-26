@@ -1,5 +1,7 @@
 package org.example.server.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"project", "users", "tags"})
+@ToString(exclude = {"users", "tags", "boardColumn"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,10 +49,6 @@ public class Task {
     @Column
     private LocalDate updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_task",
@@ -62,4 +60,17 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tag> tags;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_column_id")
+    @JsonBackReference
+    private BoardColumn boardColumn;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdDate;
+
+    @LastModifiedDate
+    @Column
+    private LocalDate updatedDate;
 }

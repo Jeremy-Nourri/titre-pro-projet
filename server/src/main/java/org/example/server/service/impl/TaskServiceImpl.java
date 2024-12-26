@@ -1,37 +1,39 @@
 package org.example.server.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.TaskDtoRequest;
-import org.example.server.exception.ProjectNotFoundException;
+import org.example.server.dto.response.TaskDtoResponse;
+import org.example.server.dto.response.TaskSimplifiedDtoResponse;
+import org.example.server.exception.BoardColumnNotFoundException;
 import org.example.server.exception.TaskNotFoundException;
-import org.example.server.model.Project;
+import org.example.server.mapper.TaskMapper;
+import org.example.server.model.BoardColumn;
 import org.example.server.model.Task;
-import org.example.server.repository.ProjectRepository;
+import org.example.server.repository.BoardColumnRepository;
 import org.example.server.repository.TaskRepository;
 import org.example.server.service.TaskService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    private final ProjectRepository projectRepository;
+    private final BoardColumnRepository boardColumnRepository;
     private final TaskRepository taskRepository;
-
-    public TaskServiceImpl(ProjectRepository projectRepository, TaskRepository taskRepository) {
-        this.projectRepository = projectRepository;
-        this.taskRepository = taskRepository;
-    }
 
     @Override
     @CheckProjectAuthorization
-    public Task createTask(Long projectId, TaskDtoRequest request) {
+    @Transactional
+    public TaskDtoResponse createTask(Long taskId, TaskDtoRequest request) {
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec ID : " + projectId));
+        BoardColumn boardColumn = boardColumnRepository.findById(request.getBoardColumnId())
+                .orElseThrow(() -> new BoardColumnNotFoundException(
+                        "Colonne non trouvée avec ID : " + request.getBoardColumnId())
+                );
 
         Task task = Task.builder()
                 .title(request.getTitle())
@@ -39,16 +41,18 @@ public class TaskServiceImpl implements TaskService {
                 .priority(request.getPriority())
                 .taskStatus(request.getTaskStatus())
                 .dueDate(request.getDueDate())
-                .project(project)
-                .createdAt(LocalDate.now())
+                .boardColumn(boardColumn)
                 .build();
 
-        return taskRepository.save(task);
+        Task taskSaved = taskRepository.save(task);
+
+        return TaskMapper.TaskToTaskDtoResponse(taskSaved);
     }
 
     @Override
     @CheckProjectAuthorization
-    public Task updateTask(Long taskId, TaskDtoRequest request) {
+    @Transactional
+    public TaskDtoResponse updateTask(Long taskId, TaskDtoRequest request) {
 
         Task existingTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Tâche non trouvée avec ID : " + taskId));
@@ -59,13 +63,14 @@ public class TaskServiceImpl implements TaskService {
         if (request.getTaskStatus() != null) existingTask.setTaskStatus(request.getTaskStatus());
         if (request.getDueDate() != null) existingTask.setDueDate(request.getDueDate());
 
-        existingTask.setUpdatedAt(LocalDate.now());
+        Task savedTask = taskRepository.save(existingTask);
 
-        return taskRepository.save(existingTask);
+        return TaskMapper.TaskToTaskDtoResponse(savedTask);
     }
 
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public void deleteTask(Long taskId) {
 
         Task existingTask = taskRepository.findById(taskId)
@@ -75,17 +80,27 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasksByProject(Long projectId) {
+    @CheckProjectAuthorization
+    @Transactional(readOnly = true)
+    public List<TaskSimplifiedDtoResponse> getTasksByBoardColumnId(Long boardColumnId) {
 
-        projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec ID : " + projectId));
+        boardColumnRepository.findById(boardColumnId)
+                .orElseThrow(() -> new BoardColumnNotFoundException(
+                        "Colonne non trouvée avec ID : " + boardColumnId)
+                );
 
-        return taskRepository.findByProjectId(projectId);
+        List<Task> tasks = taskRepository.findTasksByBoardColumnId(boardColumnId);
+
+        return TaskMapper.toTaskSummaryDTOList(tasks);
     }
 
     @Override
-    public Task getTaskById(Long taskId) {
-        return taskRepository.findById(taskId)
+    @CheckProjectAuthorization
+    @Transactional(readOnly = true)
+    public TaskDtoResponse getTaskById(Long taskId) {
+        Task taskFound = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Tâche non trouvée avec ID : " + taskId));
+
+        return TaskMapper.TaskToTaskDtoResponse(taskFound);
     }
 }

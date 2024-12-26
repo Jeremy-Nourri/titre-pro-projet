@@ -1,11 +1,14 @@
 package org.example.server.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.ProjectDtoRequest;
+import org.example.server.dto.response.ProjectDtoResponse;
 import org.example.server.exception.InvalidProjectDateException;
 import org.example.server.exception.ProjectNotFoundException;
 import org.example.server.exception.UserAlreadyAssignedException;
 import org.example.server.exception.UserNotFoundException;
+import org.example.server.mapper.ProjectMapper;
 import org.example.server.model.Project;
 import org.example.server.model.User;
 import org.example.server.model.UserProject;
@@ -14,29 +17,26 @@ import org.example.server.repository.UserRepository;
 import org.example.server.service.ProjectService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserRepository userRepository) {
-        this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
-    }
-
     @Override
-    public Project createProject(ProjectDtoRequest request, UserDetails currentUser) {
+    @Transactional
+    public ProjectDtoResponse createProject(ProjectDtoRequest request, UserDetails currentUser) {
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new InvalidProjectDateException("La date de fin ne peut pas être antérieure à la date de début.");
         }
 
         User creator = userRepository.findByEmail(currentUser.getUsername())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
         Project project = Project.builder()
                 .name(request.getName())
@@ -47,14 +47,14 @@ public class ProjectServiceImpl implements ProjectService {
                 .createdDate(LocalDate.now())
                 .build();
 
-        return projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
+        return ProjectMapper.ProjectToProjectDtoResponse(savedProject);
     }
-
 
     @Override
     @CheckProjectAuthorization
-    public Project updateProject(Long projectId, ProjectDtoRequest request) {
-
+    @Transactional
+    public ProjectDtoResponse updateProject(Long projectId, ProjectDtoRequest request) {
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
@@ -68,13 +68,14 @@ public class ProjectServiceImpl implements ProjectService {
         existingProject.setEndDate(request.getEndDate());
         existingProject.setUpdatedDate(LocalDate.now());
 
-        return projectRepository.save(existingProject);
+        Project updatedProject = projectRepository.save(existingProject);
+        return ProjectMapper.ProjectToProjectDtoResponse(updatedProject);
     }
 
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public void deleteProject(Long projectId) {
-
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
@@ -83,8 +84,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public void addUserToProject(Long projectId, Long userId) {
-
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
@@ -105,7 +106,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
         project.getUserProjects().add(userProject);
-
         projectRepository.save(project);
+    }
+
+    @Override
+    @CheckProjectAuthorization
+    @Transactional(readOnly = true)
+    public ProjectDtoResponse getProjectById(Long projectId) {
+        Project projectFound =  projectRepository.findByIdWithColumns(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
+        return ProjectMapper.ProjectToProjectDtoResponse(projectFound);
     }
 }

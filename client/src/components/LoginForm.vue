@@ -5,12 +5,23 @@ import LogoProjectFlow from '@/assets/img/logo-project-flow.webp';
 import FormInput from './ui/FormInput.vue';
 import type { LoginRequest } from '@/types/interfaces/login';
 import { useAuthStore } from '@/stores/authStore';
+import { onMounted, onBeforeUnmount } from 'vue';
+import router from '@/router';
+
 
 const emit = defineEmits<{
   (event: 'changeComponent', component: string): void;
 }>();
 
 const authStore = useAuthStore();
+
+onMounted(() => {
+    authStore.resetError();
+});
+
+onBeforeUnmount(() => {
+    authStore.resetError();
+});
 
 const schema = yup.object({
     email: yup.string().email('Email invalide').required('L\'email est requis'),
@@ -31,10 +42,13 @@ const { handleSubmit, errors } = useForm<LoginRequest>({
 const { value: email } = useField<string>('email');
 const { value: password } = useField<string>('password');
 
-
-
 const onSubmit = handleSubmit(async (values: LoginRequest) => {
+    authStore.resetError();
     await authStore.signin(values);
+    if (authStore.token) {
+        console.log('Login successful, redirecting to dashboard');
+        router.push('/dashboard');
+    }
 });
 
 </script>
@@ -57,11 +71,15 @@ const onSubmit = handleSubmit(async (values: LoginRequest) => {
                     v-model="password" class="mb-1" type="password" label="Mot de passe"
                     placeholder="Entrez votre mot de passe" autocomplete="off" :error="errors.password" 
                 />
+
+                <p v-if="authStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
+                    {{ authStore.error }}
+                </p>
             
-                <div class="my-6 ">
+                <div class="my-4 ">
                     <button
                         type="submit"
-                        class=" w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm">
+                        class=" button-primary">
                         Se connecter
                     </button>
                 </div>
