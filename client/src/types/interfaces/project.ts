@@ -1,4 +1,12 @@
+import type { BoardColumnResponse } from "./boardColumn";
 import type { UserSimplifiedResponse } from "./userSimplified";
+
+export interface Project {
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate: string;
+}
 
 export interface ProjectRequest {
   name: string;
@@ -14,9 +22,10 @@ export interface ProjectResponse {
   description?: string;
   startDate: string;
   endDate: string;
-  createdAt: string;
-  updatedAt?: string;
+  createdDate: string;
+  updatedDate?: string;
   createdBy: UserSimplifiedResponse;
   users: UserSimplifiedResponse[];
+  columns: BoardColumnResponse[];
 }
 

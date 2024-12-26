@@ -1,5 +1,6 @@
 package org.example.server.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.TagDtoRequest;
 import org.example.server.dto.response.TagDtoResponse;
@@ -12,27 +13,24 @@ import org.example.server.repository.TagRepository;
 import org.example.server.repository.TaskRepository;
 import org.example.server.service.TagService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import static org.example.server.mapper.TagMapper.mapTagToDtoTag;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 
 @Service
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final TaskRepository taskRepository;
 
-    public TagServiceImpl(TagRepository tagRepository, TaskRepository taskRepository) {
-        this.tagRepository = tagRepository;
-        this.taskRepository = taskRepository;
-    }
-
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public TagDtoResponse createTag(TagDtoRequest tagDtoRequest, Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task non trouvé avec l'id : " + taskId));
@@ -48,6 +46,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public TagDtoResponse updateTag(Long taskId, Long tagId, TagDtoRequest tagDtoRequest) {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagNotFoundException("Tag non trouvé avec l'id : " + tagId));
@@ -64,6 +63,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @CheckProjectAuthorization
+    @Transactional
     public void deleteTag(Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new TagNotFoundException("Tag non trouvé avec l'id : " + id));
@@ -73,6 +73,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @CheckProjectAuthorization
+    @Transactional(readOnly = true)
     public List<TagDtoResponse> getTagsByTask(Long taskId) {
         List<Tag> tags = tagRepository.findTagsByTaskId(taskId);
         return tags.stream()

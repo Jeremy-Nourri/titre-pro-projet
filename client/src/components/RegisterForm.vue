@@ -4,18 +4,28 @@ import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } f
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid'
 import { CheckIcon } from '@heroicons/vue/20/solid'
 import { useForm, useField } from 'vee-validate';
+import { onMounted, onBeforeUnmount } from 'vue';
 import * as yup from 'yup';
 import { Position, type UserRequest } from '@/types/interfaces/user';
 import LogoProjectFlow from '@/assets/img/logo-project-flow.webp';
 import FormInput from './ui/FormInput.vue';
 import { useUserStore } from '@/stores/userStore';
-import { error } from 'console';
 
-const emit = defineEmits<{
-  (event: 'changeComponent', component: string): void;
-}>();
+const emit = defineEmits<{(event: 'changeComponent', component: string): void;}>();
 
 const userStore = useUserStore();
+
+onMounted(() => {
+    userStore.resetError();
+});
+
+onBeforeUnmount(() => {
+    userStore.resetError();
+});
+
+setInterval(() => {
+    userStore.resetError();
+}, 30000);
 
 const positions = Object.entries(Position).map(([value, label]) => ({ value, label }));
 
@@ -111,6 +121,10 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
                 <p class="pl-1 md:text-[10px] text-[9px]">Le mot de passe doit comporter un minimum de 8 caractères, une majuscule, une minuscule, un nombre et un caractère spécial</p>
                 
                 <FormInput v-model="confirmPassword" type="password" label="Confirmation du mot de passe" placeholder="Entrez votre mot de passe" autocomplete="off" :error="errors.confirmPassword" />
+
+                <p v-if="userStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
+                    {{ userStore.error === '409' ? "Email déjà utilisé" : "Une erreur est survenue, veuillez réessayer ultérieurement" }}
+                </p>
 
                 <div class="my-6 ">
                     <button type="submit" class=" w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm">Enregistrer</button>

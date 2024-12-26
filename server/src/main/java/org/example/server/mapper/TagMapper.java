@@ -10,6 +10,9 @@ public class TagMapper {
         dto.setId(tag.getId());
         dto.setDesignation(tag.getDesignation());
         dto.setTaskId(tag.getTask().getId());
+        dto.setCreatedDate(tag.getCreatedDate());
+        dto.setUpdatedDate(tag.getUpdatedDate());
+
         return dto;
     }
 }

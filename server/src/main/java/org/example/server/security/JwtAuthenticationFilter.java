@@ -1,5 +1,8 @@
 package org.example.server.security;
 
+import org.example.server.exception.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -19,6 +22,8 @@ import java.util.Collections;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtTokenUtil jwtTokenUtil;
     private final UserRepository userRepository;
 
@@ -31,7 +36,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
 
         try {
+            if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String authorizationHeader = request.getHeader("Authorization");
+            log.info("Processing request to: {}", request.getRequestURI());
 
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 String token = authorizationHeader.substring(7);
@@ -39,9 +50,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtTokenUtil.isTokenValid(token)) {
                     Claims claims = jwtTokenUtil.validateToken(token);
                     String email = claims.getSubject();
+                    log.info("JWT valid, user: {}", email);
 
                     User user = userRepository.findByEmail(email)
-                            .orElseThrow(() -> new RuntimeException("User not found"));
+                            .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
                     UserDetails userDetails = org.springframework.security.core.userdetails.User
                             .withUsername(user.getEmail())
@@ -51,19 +63,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     JwtAuthenticationToken authentication = new JwtAuthenticationToken(userDetails, true);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    log.warn("Invalid token");
+                    sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Invalid token");
+                    return;
                 }
+            } else {
+                log.warn("Authorization header is missing or does not start with Bearer");
             }
+
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException ex) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token has expired");
+            log.error("Token has expired", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
         } catch (JwtException ex) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("Invalid token");
+            log.error("Invalid token", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Invalid token");
         } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("An error occurred while processing the request");
+            log.error("An unexpected error occurred", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing the request");
         }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
+        response.setStatus(statusCode);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + message + "\"}");
     }
 }
