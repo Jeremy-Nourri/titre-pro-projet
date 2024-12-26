@@ -20,14 +20,18 @@ public class UserMapper {
     }
 
     public static UserDtoResponse mapUserToUserDtoResponse(User user) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         UserDtoResponse response = new UserDtoResponse();
         response.setId(user.getId());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setEmail(user.getEmail());
         response.setPosition(String.valueOf(user.getPosition()));
-        response.setCreatedAt(user.getCreatedAt() != null ? user.getCreatedAt().toString() : null);
-        response.setUpdatedAt(user.getUpdatedAt() != null ? user.getUpdatedAt().toString() : null);
+        response.setCreatedDate(user.getCreatedDate());
+        response.setUpdatedDate(user.getUpdatedDate());
         if (user.getUserProjects() != null) {
             response.setUserProjects(user.getUserProjects().stream()
                     .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)
@@ -46,6 +50,7 @@ public class UserMapper {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
+        dto.setPosition(user.getPosition().toString());
         return dto;
     }
 }

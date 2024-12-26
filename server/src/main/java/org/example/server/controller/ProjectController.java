@@ -2,6 +2,8 @@ package org.example.server.controller;
 
 import jakarta.validation.Valid;
 import org.example.server.dto.request.ProjectDtoRequest;
+import org.example.server.dto.response.ProjectDtoResponse;
+import org.example.server.mapper.ProjectMapper;
 import org.example.server.model.Project;
 import org.example.server.service.ProjectService;
 import org.springframework.http.HttpStatus;
@@ -21,28 +23,26 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
-    @PostMapping
-    public ResponseEntity<Project> createProject(@Valid @RequestBody ProjectDtoRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<ProjectDtoResponse> createProject(@Valid @RequestBody ProjectDtoRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails currentUser = (UserDetails) authentication.getPrincipal();
 
-        Project createdProject = projectService.createProject(request, currentUser);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProject);
+        ProjectDtoResponse response = projectService.createProject(request, currentUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{projectId}")
-    public ResponseEntity<Project> updateProject(
+    public ResponseEntity<ProjectDtoResponse> updateProject(
             @PathVariable Long projectId,
             @Valid @RequestBody ProjectDtoRequest request) {
 
-        Project updatedProject = projectService.updateProject(projectId, request);
-        return ResponseEntity.ok(updatedProject);
+        ProjectDtoResponse response = projectService.updateProject(projectId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
-
         projectService.deleteProject(projectId);
         return ResponseEntity.noContent().build();
     }
@@ -53,4 +53,10 @@ public class ProjectController {
         return ResponseEntity.ok("Utilisateur ajouté avec succès au projet.");
     }
 
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDtoResponse> getProjectById(@PathVariable Long projectId) {
+        ProjectDtoResponse project = projectService.getProjectById(projectId);
+
+        return ResponseEntity.ok(project);
+    }
 }

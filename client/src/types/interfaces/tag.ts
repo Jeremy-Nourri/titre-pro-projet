@@ -1,9 +1,9 @@
 export interface TagRequest {
-	designation: String;
+	designation: string;
 }
 
 export interface TagResponse {
 	id: number;
-	designation: String;
+	designation: string;
 	taskId: number;
 }

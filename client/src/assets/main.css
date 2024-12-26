@@ -4,11 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+body {
+    @apply bg-bluecolor;
 }
 
+.form-input {
+    @apply block w-full rounded-md bg-white pr-2 pl-3 py-2 text-primary outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 placeholder:md:text-sm/6 placeholder:text-[12px] md:text-sm/6 text-[12px] focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor
+}
 
+.button-primary {
+    @apply w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm
+}

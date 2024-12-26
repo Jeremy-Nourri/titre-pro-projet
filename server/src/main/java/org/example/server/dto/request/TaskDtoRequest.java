@@ -26,6 +26,9 @@ public class TaskDtoRequest {
     private TaskStatusEnum taskStatus;
 
     @NotNull
+    private Long boardColumnId;
+
+    @NotNull
     private LocalDate dueDate;
 
 }

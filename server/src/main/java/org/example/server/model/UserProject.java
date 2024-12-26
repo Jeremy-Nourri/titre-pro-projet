@@ -2,6 +2,8 @@ package org.example.server.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 
@@ -30,5 +32,13 @@ public class UserProject {
 
     @Column(nullable = false)
     private LocalDate userAddAt;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdDate;
+
+    @LastModifiedDate
+    @Column
+    private LocalDate updatedDate;
 
 }

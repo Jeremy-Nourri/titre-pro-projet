@@ -13,7 +13,7 @@ public class UserProjectMapper {
         response.setId(userProject.getId());
         response.setProjectId(userProject.getProject().getId());
         response.setProjectName(userProject.getProject().getName());
-        response.setUserAddedAt(userProject.getUserAddAt() != null ? userProject.getUserAddAt().toString() : null);
+        response.setUserAddedAt(userProject.getUserAddAt());
         return response;
     }
 }
