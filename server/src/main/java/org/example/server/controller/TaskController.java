@@ -23,32 +23,54 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDtoResponse> createTask(@PathVariable Long projectId, @Valid @RequestBody TaskDtoRequest request) {
-        TaskDtoResponse createdTask = taskService.createTask(projectId, request);
+    public ResponseEntity<TaskDtoResponse> createTask(
+            @PathVariable Long projectId,
+            @PathVariable Long boardColumnId,
+            @Valid @RequestBody TaskDtoRequest request) {
+        TaskDtoResponse createdTask = taskService.createTask(projectId, boardColumnId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<TaskDtoResponse> updateTask(@PathVariable Long taskId, @Valid @RequestBody TaskDtoRequest request) {
-        TaskDtoResponse updatedTask = taskService.updateTask(taskId, request);
+    public ResponseEntity<TaskDtoResponse> updateTask(
+            @PathVariable Long projectId,
+            @PathVariable Long taskId,
+            @Valid @RequestBody TaskDtoRequest request) {
+        TaskDtoResponse updatedTask = taskService.updateTask(projectId, taskId, request);
         return ResponseEntity.ok(updatedTask);
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
-        taskService.deleteTask(taskId);
+    public ResponseEntity<Void> deleteTask(
+            @PathVariable Long projectId,
+            @PathVariable Long taskId) {
+        taskService.deleteTask(projectId, taskId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskSimplifiedDtoResponse>> getTasksByBoardColum(@PathVariable Long boardColumnId) {
-        List<TaskSimplifiedDtoResponse> tasks = taskService.getTasksByBoardColumnId(boardColumnId);
+    public ResponseEntity<List<TaskSimplifiedDtoResponse>> getTasksByBoardColum(
+            @PathVariable Long projectId,
+            @PathVariable Long boardColumnId) {
+        List<TaskSimplifiedDtoResponse> tasks = taskService.getTasksByBoardColumnId(projectId, boardColumnId);
         return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<TaskDtoResponse> getTaskById(@PathVariable Long taskId) {
-        TaskDtoResponse task = taskService.getTaskById(taskId);
+    public ResponseEntity<TaskDtoResponse> getTaskById(
+            @PathVariable Long projectId,
+            @PathVariable Long taskId) {
+        TaskDtoResponse task = taskService.getTaskById(projectId, taskId);
         return ResponseEntity.ok(task);
+    }
+
+    @PutMapping("/{taskId}/move")
+    public ResponseEntity<TaskDtoResponse> moveTaskToColumn(
+            @PathVariable Long projectId,
+            @PathVariable Long taskId,
+            @PathVariable Long boardColumnId
+    ) {
+        TaskDtoResponse response = taskService.moveTaskToColumn(projectId, taskId, boardColumnId);
+        return ResponseEntity.ok(response);
     }
 }

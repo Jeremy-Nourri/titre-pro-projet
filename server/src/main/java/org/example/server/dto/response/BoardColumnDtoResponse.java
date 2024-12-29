@@ -13,5 +13,5 @@ public class BoardColumnDtoResponse {
     private Long projectId;
     private LocalDate createdDate;
     private LocalDate updatedDate;
-    private List<TaskSimplifiedDtoResponse> tasks;
+    private List<TaskDtoResponse> tasks;
 }

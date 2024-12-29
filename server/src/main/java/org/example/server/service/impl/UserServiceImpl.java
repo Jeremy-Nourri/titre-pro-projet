@@ -1,7 +1,6 @@
 package org.example.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.UserDtoRequest;
 import org.example.server.dto.response.UserDtoResponse;
 import org.example.server.exception.EmailExistsException;

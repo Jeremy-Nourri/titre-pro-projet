@@ -3,16 +3,12 @@ package org.example.server.aspect;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.example.server.exception.BoardColumnNotFoundException;
 import org.example.server.exception.ProjectNotFoundException;
-import org.example.server.exception.TaskNotFoundException;
 import org.example.server.exception.UnauthorizedProjectAccessException;
-import org.example.server.model.BoardColumn;
+import org.example.server.exception.UserNotFoundException;
 import org.example.server.model.Project;
-import org.example.server.model.Task;
-import org.example.server.repository.BoardColumnRepository;
 import org.example.server.repository.ProjectRepository;
-import org.example.server.repository.TaskRepository;
+import org.example.server.repository.UserRepository;
 import org.example.server.security.SecurityUtil;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +19,7 @@ public class AuthorizationAspect {
 
     private final SecurityUtil securityUtil;
     private final ProjectRepository projectRepository;
-    private final BoardColumnRepository boardColumnRepository;
-    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @Before("@annotation(CheckProjectAuthorization) && args(projectId,..)")
     public void checkAuthorizationByProjectId(Long projectId) {
@@ -40,43 +35,18 @@ public class AuthorizationAspect {
         }
     }
 
+    @Before("@annotation(CheckUserAuthorization) && args(userId,..)")
+    public void checkAuthorizationByUserId(Long userId) {
 
-    @Before("@annotation(CheckProjectAuthorization) && args(boardColumnId,..)")
-    public void checkAuthorizationByBoardColumnId(Long boardColumnId) {
+        String currentUserEmail = securityUtil.getCurrentUserEmail();
 
-        BoardColumn column = boardColumnRepository.findById(boardColumnId)
-                .orElseThrow(() -> new BoardColumnNotFoundException(
-                        "Colonne non trouvée avec ID : " + boardColumnId)
-                );
-        Long projectId = column.getProject().getId();
-
-        if (!securityUtil.isUserInProject(projectId)) {
-            throw new UnauthorizedProjectAccessException(
-                    "Vous n'êtes pas autorisé à accéder à la colonne " + boardColumnId
-                            + " (projet " + projectId + ")");
-        }
-    }
-
-    @Before("@annotation(CheckProjectAuthorization) && args(taskId,..)")
-    public void checkAuthorizationByTaskId(Long taskId) {
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException(
-                        "Tâche non trouvée avec ID : " + taskId)
-                );
-
-        BoardColumn column = task.getBoardColumn();
-        if (column == null) {
-            throw new BoardColumnNotFoundException("La tâche " + taskId
-                    + " n'est pas rattachée à une colonne valide !");
-        }
-        Long projectId = column.getProject().getId();
-
-        if (!securityUtil.isUserInProject(projectId)) {
-            throw new UnauthorizedProjectAccessException(
-                    "Vous n'êtes pas autorisé à accéder à la tâche " + taskId
-                            + " (projet " + projectId + ")");
-        }
+        userRepository.findById(userId).ifPresentOrElse(user -> {
+            if (!user.getEmail().equals(currentUserEmail)) {
+                throw new UnauthorizedProjectAccessException(
+                        "Vous n'êtes pas autorisé à accéder aux données de l'utilisateur avec ID : " + userId);
+            }
+        }, () -> {
+            throw new UserNotFoundException("Utilisateur non trouvé avec ID : " + userId);
+        });
     }
 }
-

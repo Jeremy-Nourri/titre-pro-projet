@@ -4,7 +4,12 @@ export interface TaskRequest {
   title: string;
   dueDate: string;
   detail?: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: Priority,
+  taskStatus: Status,
+  columnBoardId?: number;
+  tags?: TagResponse[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TaskResponse {
@@ -12,9 +17,9 @@ export interface TaskResponse {
   title: string;
   dueDate: string;
   detail?: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
-  taskStatus: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED',
-  columnnBoardId: number;
+  priority: Priority;
+  taskStatus: Status;
+  columnBoardId: number;
   tags: TagResponse[];
   createdAt: string;
   updatedAt?: string;
@@ -23,5 +28,16 @@ export interface TaskResponse {
 export interface TaskSimplifiedResponse {
   id: number;
   title: string;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: Status
+}
+
+export enum Priority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}
+export enum Status {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
 }

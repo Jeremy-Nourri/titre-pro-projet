@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.TagDtoRequest;
 import org.example.server.dto.response.TagDtoResponse;
+import org.example.server.exception.InvalidTagTaskAssociationException;
 import org.example.server.exception.TagNotFoundException;
 import org.example.server.exception.TaskNotFoundException;
 import org.example.server.mapper.TagMapper;
@@ -31,7 +32,7 @@ public class TagServiceImpl implements TagService {
     @Override
     @CheckProjectAuthorization
     @Transactional
-    public TagDtoResponse createTag(TagDtoRequest tagDtoRequest, Long taskId) {
+    public TagDtoResponse createTag(Long projectId, TagDtoRequest tagDtoRequest, Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task non trouvé avec l'id : " + taskId));
 
@@ -47,24 +48,33 @@ public class TagServiceImpl implements TagService {
     @Override
     @CheckProjectAuthorization
     @Transactional
-    public TagDtoResponse updateTag(Long taskId, Long tagId, TagDtoRequest tagDtoRequest) {
+    public TagDtoResponse updateTag(Long projectId, Long taskId, Long tagId, TagDtoRequest tagDtoRequest) {
+
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagNotFoundException("Tag non trouvé avec l'id : " + tagId));
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task non trouvé avec l'id : " + taskId));
 
-        tag.setDesignation(tagDtoRequest.getDesignation());
+        if (!tag.getTask().getId().equals(taskId)) {
+            throw new InvalidTagTaskAssociationException("Le tag avec l'id " + tagId + " n'est pas associé à la tâche avec l'id " + taskId);
+        }
+
+        if (tagDtoRequest.getDesignation() != null) {
+            tag.setDesignation(tagDtoRequest.getDesignation());
+        }
         tag.setTask(task);
 
-        tag = tagRepository.save(tag);
-        return mapTagToDtoTag(tag);
+        Tag updatedTag = tagRepository.save(tag);
+
+        return mapTagToDtoTag(updatedTag);
     }
+
 
     @Override
     @CheckProjectAuthorization
     @Transactional
-    public void deleteTag(Long id) {
+    public void deleteTag(Long projectId, Long id) {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new TagNotFoundException("Tag non trouvé avec l'id : " + id));
 
@@ -74,7 +84,7 @@ public class TagServiceImpl implements TagService {
     @Override
     @CheckProjectAuthorization
     @Transactional(readOnly = true)
-    public List<TagDtoResponse> getTagsByTask(Long taskId) {
+    public List<TagDtoResponse> getTagsByTask(Long projectId, Long taskId) {
         List<Tag> tags = tagRepository.findTagsByTaskId(taskId);
         return tags.stream()
                 .map(TagMapper::mapTagToDtoTag)

@@ -9,13 +9,15 @@ import java.util.List;
 
 public interface TaskService {
 
-    TaskDtoResponse createTask(Long projectId, TaskDtoRequest request);
+    TaskDtoResponse createTask(Long projectId, Long boardColumnId, TaskDtoRequest request);
 
-    TaskDtoResponse updateTask(Long taskId, TaskDtoRequest request);
+    TaskDtoResponse updateTask(Long projectId, Long taskId, TaskDtoRequest request);
 
-    void deleteTask(Long taskId);
+    void deleteTask(Long projectId, Long taskId);
 
-    List<TaskSimplifiedDtoResponse> getTasksByBoardColumnId(Long boardColumnId);
+    List<TaskSimplifiedDtoResponse> getTasksByBoardColumnId(Long projectId, Long boardColumnId);
 
-    TaskDtoResponse getTaskById(Long taskId);
+    TaskDtoResponse getTaskById(Long projectId, Long taskId);
+
+    TaskDtoResponse moveTaskToColumn(Long projectId, Long taskId, Long columnId);
 }

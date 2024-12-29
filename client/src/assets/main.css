@@ -8,6 +8,39 @@ body {
     @apply bg-bluecolor;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @apply font-title;
+}
+    
+p {
+    @apply font-body;
+}
+
+h1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-bold first-letter:uppercase;
+}
+
+h2 {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-bold first-letter:uppercase;
+}
+
+h3 {
+    @apply text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl font-bold first-letter:uppercase;
+}
+
+h4 {
+    @apply text-base sm:text-base md:text-lg lg:text-lg xl:text-2xl font-bold first-letter:uppercase;
+}
+
+.p-text {
+    @apply text-[0.7rem] sm:text-sm md:text-base lg:text-lg xl:text-lg
+}
+
 .form-input {
     @apply block w-full rounded-md bg-white pr-2 pl-3 py-2 text-primary outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 placeholder:md:text-sm/6 placeholder:text-[12px] md:text-sm/6 text-[12px] focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor
 }
@@ -15,3 +48,8 @@ body {
 .button-primary {
     @apply w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm
 }
+
+.button-secondary {
+    @apply justify-center rounded-md hover:bg-bluecolor outline outline-4 outline-blue-600 bg-slate-50 hover:outline-bluecolor ease-in duration-300 pr-2 pl-3 py-2 hover:text-white text-bluecolor md:text-sm/6 text-[12px] font-medium shadow-sm
+}
+

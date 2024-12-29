@@ -2,6 +2,7 @@ package org.example.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
+import org.example.server.aspect.CheckUserAuthorization;
 import org.example.server.dto.request.ProjectDtoRequest;
 import org.example.server.dto.response.ProjectDtoResponse;
 import org.example.server.exception.InvalidProjectDateException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,23 +54,47 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @CheckUserAuthorization
+    @Transactional(readOnly = true)
+    public List<ProjectDtoResponse> getProjectsByUserId(Long userId) {
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec ID " + userId + " non trouvé"));
+
+        List<Project> projects = projectRepository.findAllByUserId(userId);
+
+        return projects.stream().map(ProjectMapper::ProjectToProjectDtoResponse).toList();
+    }
+
+    @Override
     @CheckProjectAuthorization
     @Transactional
     public ProjectDtoResponse updateProject(Long projectId, ProjectDtoRequest request) {
+
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
-        if (request.getEndDate().isBefore(request.getStartDate())) {
-            throw new InvalidProjectDateException("La date de fin ne peut pas être antérieure à la date de début.");
+        if (request.getStartDate() != null && request.getEndDate() != null) {
+            if (request.getEndDate().isBefore(request.getStartDate())) {
+                throw new InvalidProjectDateException("La date de fin ne peut pas être antérieure à la date de début.");
+            }
         }
 
-        existingProject.setName(request.getName());
-        existingProject.setDescription(request.getDescription());
-        existingProject.setStartDate(request.getStartDate());
-        existingProject.setEndDate(request.getEndDate());
-        existingProject.setUpdatedDate(LocalDate.now());
+        if (request.getName() != null) {
+            existingProject.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            existingProject.setDescription(request.getDescription());
+        }
+        if (request.getStartDate() != null) {
+            existingProject.setStartDate(request.getStartDate());
+        }
+        if (request.getEndDate() != null) {
+            existingProject.setEndDate(request.getEndDate());
+        }
 
         Project updatedProject = projectRepository.save(existingProject);
+
         return ProjectMapper.ProjectToProjectDtoResponse(updatedProject);
     }
 

@@ -21,33 +21,37 @@ public class TagController {
 
     @PostMapping
     public ResponseEntity<TagDtoResponse> createTag(
+            @PathVariable Long projectId,
             @PathVariable Long taskId,
             @RequestBody TagDtoRequest tagDtoRequest) {
-        TagDtoResponse tagDtoResponse = tagService.createTag(tagDtoRequest, taskId);
+        TagDtoResponse tagDtoResponse = tagService.createTag(projectId, tagDtoRequest, taskId);
         return ResponseEntity.status(HttpStatus.CREATED).body(tagDtoResponse);
     }
 
     @PutMapping("/{tagId}")
     public ResponseEntity<TagDtoResponse> updateTag(
+            @PathVariable Long projectId,
             @PathVariable Long taskId,
             @PathVariable Long tagId,
             @RequestBody TagDtoRequest tagDtoRequest) {
-        TagDtoResponse tagDtoResponse = tagService.updateTag(taskId, tagId, tagDtoRequest);
+        TagDtoResponse tagDtoResponse = tagService.updateTag(projectId, taskId, tagId, tagDtoRequest);
         return ResponseEntity.ok(tagDtoResponse);
     }
 
     @DeleteMapping("/{tagId}")
     public ResponseEntity<Void> deleteTag(
+            @PathVariable Long projectId,
             @PathVariable Long tagId) {
-        tagService.deleteTag(tagId);
+        tagService.deleteTag(projectId, tagId);
         return ResponseEntity.noContent().build();
 
     }
 
     @GetMapping
     public ResponseEntity<List<TagDtoResponse>> getTagsByTask(
+            @PathVariable Long projectId,
             @PathVariable Long taskId) {
-        List<TagDtoResponse> tagDtoResponses = tagService.getTagsByTask(taskId);
+        List<TagDtoResponse> tagDtoResponses = tagService.getTagsByTask(projectId, taskId);
         return ResponseEntity.ok(tagDtoResponses);
     }
 }
