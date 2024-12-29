@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
@@ -58,5 +60,11 @@ public class ProjectController {
         ProjectDtoResponse project = projectService.getProjectById(projectId);
 
         return ResponseEntity.ok(project);
+    }
+
+    @GetMapping("/user/{userId}/projectslist")
+    public ResponseEntity<List<ProjectDtoResponse>> getProjectsByUser(@PathVariable Long userId) {
+        List<ProjectDtoResponse> projects = projectService.getProjectsByUserId(userId);
+        return ResponseEntity.ok(projects);
     }
 }

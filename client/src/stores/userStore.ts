@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { createUser } from '@/services/userService';
+import { createUser, getUserDetails } from '@/services/userService';
 import type { UserRequest, UserResponse } from '@/types/interfaces/user';
 
 export const useUserStore = defineStore('user', () => {
 	
-    const users = ref<UserResponse[]>([]);
+    const user = ref<UserResponse>();
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
@@ -13,27 +13,44 @@ export const useUserStore = defineStore('user', () => {
         error.value = null;
     };
 
-    const addUser = async (user: UserRequest) => {
+    const addUser = async (userRequest: UserRequest) => {
         isLoading.value = true;
         resetError();
 
-        const response = await createUser(user);
+        const response = await createUser(userRequest);
 
         if (typeof response === 'string') {
             error.value = response;
 
         } else {
-            users.value.push(response);
+            user.value = response;
+        }
+        
+        isLoading.value = false;
+    };
+
+    const getUserById = async (userId: number, token: string) => {
+        isLoading.value = true;
+        resetError();
+
+        const response = await getUserDetails(userId, token);
+
+        if (typeof response === 'string') {
+            error.value = response;
+
+        } else {
+            user.value = response;
         }
         
         isLoading.value = false;
     };
 
     return {
-        users,
+        user,
         isLoading,
         error,
         addUser,
+        getUserById,
         resetError
     };
 });

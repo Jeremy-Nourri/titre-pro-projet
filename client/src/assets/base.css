@@ -12,25 +12,4 @@
     font-style: normal;
 }
 
-@layer base {
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        @apply font-title;
-    }
-    h1 {
-        @apply text-2xl sm:text-4xl md:text-4xl lg:text-5xl font-bold;
-    }
-    h2 {
-        @apply text-xl sm:text-xl md:text-3xl lg:text-4xl font-bold;
-    }
-    h3 {
-        @apply text-xl sm:text-lg md:text-2xl lg:text-3xl font-bold;
-    }
-    p {
-        @apply font-body;
-    }
-}
+

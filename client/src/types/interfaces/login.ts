@@ -1,6 +1,3 @@
-import type { ProjectResponse } from "./project";
-import type { UserProjectResponse } from "./userProject";
-
 export interface LoginRequest {
  email: string;
  password: string;
@@ -15,6 +12,4 @@ export interface LoginResponse {
 	createdAt?: string;
 	updatedAt?: string;
 	token: string;
-	createdProjects?: ProjectResponse[];
-	userProjects?: UserProjectResponse[];
 }

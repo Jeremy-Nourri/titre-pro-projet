@@ -1,4 +1,4 @@
-import { api, handleApiError } from '@/api';
+import { api, handleApiError, fetchWithAuth } from '@/api';
 
 import type { LoginRequest, LoginResponse } from '@/types/interfaces/login';
 
@@ -11,21 +11,6 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse | 
     }
 };
 
-export const getUserDetails = async (userId: number, token: string) => {
-
-    try {
-        const response = await api.get(`/users/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-        
-    } catch (error) {
-        localStorage.removeItem('token');
-        return handleApiError(error);
-    }
+export const getUserDetails = async (userId: number, token: string): Promise<LoginResponse | string> => {
+    return await fetchWithAuth<LoginResponse>('GET', `/users/${userId}`, token);
 };
-
-
-

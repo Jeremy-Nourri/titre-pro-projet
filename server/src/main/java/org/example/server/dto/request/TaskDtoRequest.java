@@ -7,12 +7,15 @@ import org.example.server.model.PriorityEnum;
 import org.example.server.model.TaskStatusEnum;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskDtoRequest {
+
+    private Long id;
 
     @NotBlank
     private String title;
@@ -30,5 +33,7 @@ public class TaskDtoRequest {
 
     @NotNull
     private LocalDate dueDate;
+
+    private List<TagDtoRequest> tags;
 
 }

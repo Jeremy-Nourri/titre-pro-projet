@@ -1,4 +1,4 @@
-import { api, handleApiError } from '@/api';
+import { api, handleApiError, fetchWithAuth } from '@/api';
 import type { UserRequest, UserResponse } from '@/types/interfaces/user';
 
 
@@ -11,5 +11,6 @@ export const createUser = async (user: UserRequest): Promise<UserResponse | stri
     }
 };
 
-
-
+export const getUserDetails = async (userId: number, token: string): Promise<UserResponse | string> => {
+    return await fetchWithAuth<UserResponse>('GET', `/users/${userId}`, token);
+};

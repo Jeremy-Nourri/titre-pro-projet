@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/projects/{projectId}/column/")
+@RequestMapping("/api/projects/{projectId}/columns")
 @RequiredArgsConstructor
 public class BoardColumnController {
 
@@ -27,27 +27,29 @@ public class BoardColumnController {
 
     @GetMapping("/{columnId}")
     public ResponseEntity<BoardColumnDtoResponse> getBoardColumn(
+            @PathVariable Long projectId,
             @PathVariable Long columnId
     ) {
-        BoardColumnDtoResponse response = boardColumnService.getBoardColumn(columnId);
+        BoardColumnDtoResponse response = boardColumnService.getBoardColumn(projectId, columnId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{columnId}")
     public ResponseEntity<BoardColumnDtoResponse> updateBoardColumn(
-            @PathVariable Long columnId,
             @PathVariable Long projectId,
+            @PathVariable Long columnId,
             @Valid @RequestBody BoardColumnDtoRequest requestDTO
     ) {
-        BoardColumnDtoResponse response = boardColumnService.updateBoardColumn(columnId, projectId, requestDTO);
+        BoardColumnDtoResponse response = boardColumnService.updateBoardColumn(projectId, columnId, requestDTO);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{columnId}")
     public ResponseEntity<Void> deleteBoardColumn(
+            @PathVariable Long projectId,
             @PathVariable Long columnId
     ) {
-        boardColumnService.deleteBoardColumn(columnId);
+        boardColumnService.deleteBoardColumn(projectId, columnId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -16,7 +16,8 @@ export default {
                 secondary: "#63666a",
                 bluecolor: "#004aad",
                 danger: "#EF4444",
-            }
+            },
+            
         }
     },
     plugins: [import("tailwindcss-animate")],

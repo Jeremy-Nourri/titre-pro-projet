@@ -10,7 +10,7 @@ public class BoardColumnMapper {
         dto.setId(boardColumn.getId());
         dto.setName(boardColumn.getName());
         dto.setProjectId(boardColumn.getProject().getId());
-        dto.setTasks(TaskMapper.toTaskSummaryDTOList(boardColumn.getTasks()));
+        dto.setTasks(TaskMapper.toTaskDTOList(boardColumn.getTasks()));
         dto.setCreatedDate(boardColumn.getCreatedDate());
         dto.setUpdatedDate(boardColumn.getUpdatedDate());
         return dto;

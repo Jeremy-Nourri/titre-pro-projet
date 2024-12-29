@@ -26,8 +26,4 @@ public class LoginDtoResponse {
     private LocalDate updatedDate;
     private String token;
 
-    private List<ProjectDtoResponse> createdProjects;
-    private List<UserProjectDtoResponse> userProjects;
-
-
 }

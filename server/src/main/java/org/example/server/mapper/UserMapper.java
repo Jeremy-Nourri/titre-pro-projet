@@ -32,6 +32,11 @@ public class UserMapper {
         response.setPosition(String.valueOf(user.getPosition()));
         response.setCreatedDate(user.getCreatedDate());
         response.setUpdatedDate(user.getUpdatedDate());
+        if(user.getCreatedProjects() != null) {
+            response.setCreatedProjects(user.getCreatedProjects().stream()
+                    .map(ProjectMapper::ProjectToProjectDtoResponse)
+                    .collect(Collectors.toList()));
+        }
         if (user.getUserProjects() != null) {
             response.setUserProjects(user.getUserProjects().stream()
                     .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)

@@ -26,6 +26,6 @@ export interface ProjectResponse {
   updatedDate?: string;
   createdBy: UserSimplifiedResponse;
   users: UserSimplifiedResponse[];
-  columns: BoardColumnResponse[];
+  boardColumns: BoardColumnResponse[];
 }
 

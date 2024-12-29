@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import NewProjectView from '@/views/NewProjectView.vue'
-import ProjectView from '@/views/ProjectView.vue'
+import ProjectBoardView from '@/views/ProjectBoardView.vue'
+import ListProjectsView from '@/views/ListProjectsView.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -30,8 +31,18 @@ const router = createRouter({
         },
         { 
             path: '/project/:id', 
-            name: 'ProjectView', 
-            component: ProjectView,
+            name: 'ProjectBoardView', 
+            component: ProjectBoardView,
+            props: true,
+            meta: {
+                requiresAuth: true,
+            },
+        },
+        { 
+            path: '/projects', 
+            name: 'ListProjectsView', 
+            component: ListProjectsView,
+            props: true,
             meta: {
                 requiresAuth: true,
             },

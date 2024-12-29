@@ -31,3 +31,24 @@ export const handleApiError = (error: unknown): string => {
 
     return "Une erreur inattendue s'est produite. Veuillez réessayer.";
 };
+
+export const fetchWithAuth = async <T>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
+    token: string,
+    data?: object | string
+): Promise<T> => {
+    try {
+        const response = await api.request<T>({
+            method,
+            url,
+            data,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(handleApiError(error));
+    }
+};

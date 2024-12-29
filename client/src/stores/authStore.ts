@@ -27,8 +27,6 @@ export const useAuthStore = defineStore("authStore", () => {
             position: response.position,
             createdAt: response.createdAt,
             updatedAt: response.updatedAt,
-            createdProjects: response.createdProjects,
-            userProjects: response.userProjects,
         };
     };
 
@@ -99,6 +97,8 @@ export const useAuthStore = defineStore("authStore", () => {
                     error.value = response;
                 } else {
                     updateAuthData(response);
+                    console.log('response fetch', response);
+                    console.log(user);
                 }
             } else {
                 throw new Error("Impossible de décoder le token.");
