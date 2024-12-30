@@ -24,6 +24,8 @@ public class LoginDtoResponse {
     private LocalDate createdDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate updatedDate;
+    private List<ProjectDtoResponse> createdProjects;
+    private List<UserProjectDtoResponse> userProjects;
     private String token;
 
 }

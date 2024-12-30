@@ -27,6 +27,9 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String designation;
 
+    @Column(nullable = true, length = 7)
+    private String color;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)
     private Task task;

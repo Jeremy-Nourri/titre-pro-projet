@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public class TagDtoResponse {
     private Long id;
     private String designation;
+    private String color;
     private Long taskId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate createdDate;

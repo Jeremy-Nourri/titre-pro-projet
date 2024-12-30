@@ -5,13 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
 import org.example.server.dto.request.BoardColumnDtoRequest;
 import org.example.server.dto.response.BoardColumnDtoResponse;
+import org.example.server.dto.response.ProjectDtoResponse;
 import org.example.server.exception.BoardColumnNotFoundException;
 import org.example.server.exception.ProjectNotFoundException;
 import org.example.server.mapper.BoardColumnMapper;
-import org.example.server.mapper.TaskMapper;
+import org.example.server.mapper.ProjectMapper;
 import org.example.server.model.BoardColumn;
 import org.example.server.model.Project;
-import org.example.server.model.Task;
+import org.example.server.model.RoleEnum;
 import org.example.server.repository.BoardColumnRepository;
 import org.example.server.repository.ProjectRepository;
 import org.example.server.repository.TaskRepository;
@@ -31,12 +32,16 @@ public class BoardColumnServiceImpl implements BoardColumnService {
     private final TaskRepository taskRepository;
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public BoardColumnDtoResponse createBoardColumn(Long projectId, BoardColumnDtoRequest requestDTO) {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec l'id : " + projectId));
+
+        if (project.getColumns().size() >= 4) {
+            throw new IllegalArgumentException("Impossible d'ajouter plus de 4 colonnes.");
+        }
 
         BoardColumn boardColumn = BoardColumn.builder()
                 .name(requestDTO.getName())
@@ -59,7 +64,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public BoardColumnDtoResponse updateBoardColumn(Long projectId, Long columnId, BoardColumnDtoRequest requestDTO) {
 
@@ -84,9 +89,9 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
 
     @Override
-    @CheckProjectAuthorization
-    @Transactional(readOnly = true)
-    public void deleteBoardColumn(Long projectId, Long columnId) {
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
+    @Transactional
+    public ProjectDtoResponse deleteBoardColumn(Long projectId, Long columnId) {
 
         Optional<BoardColumn> optionalColumn = boardColumnRepository.findById(columnId);
         if (optionalColumn.isEmpty()) {
@@ -94,5 +99,13 @@ public class BoardColumnServiceImpl implements BoardColumnService {
         }
 
         boardColumnRepository.deleteById(columnId);
+
+        boardColumnRepository.flush();
+
+        Project projectFound = projectRepository.findByIdWithColumns(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
+
+        return ProjectMapper.ProjectToProjectDtoResponse(projectFound);
     }
+
 }

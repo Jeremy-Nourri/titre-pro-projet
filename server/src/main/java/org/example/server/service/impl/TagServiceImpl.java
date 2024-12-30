@@ -8,6 +8,7 @@ import org.example.server.exception.InvalidTagTaskAssociationException;
 import org.example.server.exception.TagNotFoundException;
 import org.example.server.exception.TaskNotFoundException;
 import org.example.server.mapper.TagMapper;
+import org.example.server.model.RoleEnum;
 import org.example.server.model.Tag;
 import org.example.server.model.Task;
 import org.example.server.repository.TagRepository;
@@ -30,7 +31,7 @@ public class TagServiceImpl implements TagService {
     private final TaskRepository taskRepository;
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public TagDtoResponse createTag(Long projectId, TagDtoRequest tagDtoRequest, Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -46,7 +47,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public TagDtoResponse updateTag(Long projectId, Long taskId, Long tagId, TagDtoRequest tagDtoRequest) {
 
@@ -63,6 +64,9 @@ public class TagServiceImpl implements TagService {
         if (tagDtoRequest.getDesignation() != null) {
             tag.setDesignation(tagDtoRequest.getDesignation());
         }
+        if (tagDtoRequest.getColor() != null) {
+            tag.setColor(tagDtoRequest.getColor());
+        }
         tag.setTask(task);
 
         Tag updatedTag = tagRepository.save(tag);
@@ -72,7 +76,7 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public void deleteTag(Long projectId, Long id) {
         Tag tag = tagRepository.findById(id)
@@ -82,7 +86,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = true)
     @Transactional(readOnly = true)
     public List<TagDtoResponse> getTagsByTask(Long projectId, Long taskId) {
         List<Tag> tags = tagRepository.findTagsByTaskId(taskId);

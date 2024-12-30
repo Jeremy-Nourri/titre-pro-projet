@@ -1,9 +1,11 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { jwtDecode } from 'jwt-decode';
-import type { LoginRequest, LoginResponse } from '@/types/interfaces/login';
-import { getUserDetails, login } from '@/services/authService';
-import { useRouter } from 'vue-router';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { jwtDecode } from "jwt-decode";
+import type { LoginRequest, LoginResponse } from "@/types/interfaces/login";
+import { login } from "@/services/authService";
+import { createUser, getUserDetails } from "@/services/userService";
+import { useRouter } from "vue-router";
+import type { UserRequest } from "@/types/interfaces/user";
 
 export const useAuthStore = defineStore("authStore", () => {
     const token = ref<string | null>(localStorage.getItem("token"));
@@ -19,15 +21,7 @@ export const useAuthStore = defineStore("authStore", () => {
     const updateAuthData = (response: LoginResponse) => {
         token.value = response.token;
         localStorage.setItem("token", response.token);
-        user.value = {
-            id: response.id,
-            firstName: response.firstName,
-            lastName: response.lastName,
-            email: response.email,
-            position: response.position,
-            createdAt: response.createdAt,
-            updatedAt: response.updatedAt,
-        };
+        user.value = response;
     };
 
     const decodeToken = (token: string): { userId: number; sub: string; exp: number } | null => {
@@ -39,25 +33,22 @@ export const useAuthStore = defineStore("authStore", () => {
         }
     };
 
-    const checkTokenInStore = () => {
-        if (!user.value) {
-            signout();
-            throw new Error('Utilisateur non authentifié');
-        } else if (!token.value) {
-            signout();
-            throw new Error('Token non fourni');
-        } else {
-            const decodedToken = decodeToken(token.value);
-            if (!decodedToken || isTokenExpired(decodedToken.exp)) {
-                signout();
-                throw new Error('Token expiré');
-            }
-        }
-    }
-
     const isTokenExpired = (exp: number): boolean => {
         const now = Math.floor(Date.now() / 1000);
         return exp < now;
+    };
+
+    const isAuthenticated = (): boolean => {
+        if (!token.value) return false;
+        const decoded = decodeToken(token.value);
+        return decoded !== null && !isTokenExpired(decoded.exp);
+    };
+
+    const handleError = (err: unknown): string => {
+        if (err instanceof Error) {
+            return err.message;
+        }
+        return "Une erreur inattendue s'est produite.";
     };
 
     const signin = async (credentials: LoginRequest) => {
@@ -65,14 +56,18 @@ export const useAuthStore = defineStore("authStore", () => {
         resetError();
         try {
             const response = await login(credentials);
-            if (typeof response === 'string') {
-                error.value = response;
+            updateAuthData(response);
+
+            const redirectPath = router.currentRoute.value.query.redirect as string;
+
+            if (redirectPath) {
+                await router.push(redirectPath);
             } else {
-                updateAuthData(response);
-                await router.push({ name: 'DashboardView' });
+                await router.push({ name: "DashboardView" });
             }
         } catch (err) {
             console.error("Erreur lors de la connexion :", err);
+            error.value = handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -82,34 +77,56 @@ export const useAuthStore = defineStore("authStore", () => {
         token.value = null;
         user.value = null;
         localStorage.removeItem("token");
-        await router.push({ name: 'HomeView' });
+        await router.push({ name: "HomeView" });
     };
 
-    const fetchUser = async (tokenParam: string) => {
+    const fetchUser = async () => {
+        if (!token.value) return;
         isLoading.value = true;
         resetError();
         try {
-            const decoded = decodeToken(tokenParam);
-
+            const decoded = decodeToken(token.value);
             if (decoded) {
-                const response = await getUserDetails(decoded.userId, tokenParam);
-                if (typeof response === 'string') {
-                    error.value = response;
-                } else {
-                    updateAuthData(response);
-                    console.log('response fetch', response);
-                    console.log(user);
-                }
+                const response = await getUserDetails(decoded.userId);
+                user.value = response;
             } else {
                 throw new Error("Impossible de décoder le token.");
             }
         } catch (err) {
             console.error("Erreur lors de la récupération des informations de l'utilisateur :", err);
+            error.value = handleError(err);
         } finally {
             isLoading.value = false;
         }
-
     };
+
+    const addUser = async (userRequest: UserRequest) => {
+        isLoading.value = true;
+        resetError();
+        try {
+            await createUser(userRequest);
+        } catch (err) {
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
+        }
+    };
+    
+    const getUserById = async (userId: number) => {
+        isLoading.value = true;
+        resetError();
+        try {
+            const response = await getUserDetails(userId);
+            if (response) {
+                user.value = response;
+            }
+        } catch (err) {
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
+        }
+    };
+    
 
     const initializeAuth = async () => {
         const storedToken = localStorage.getItem("token");
@@ -117,9 +134,8 @@ export const useAuthStore = defineStore("authStore", () => {
             const decoded = decodeToken(storedToken);
             if (decoded && !isTokenExpired(decoded.exp)) {
                 token.value = storedToken;
-    
-                if (!user.value || !user.value.id) {
-                    await fetchUser(storedToken);
+                if (!user.value) {
+                    await fetchUser();
                 }
             } else {
                 await signout();
@@ -138,7 +154,9 @@ export const useAuthStore = defineStore("authStore", () => {
         signout,
         initializeAuth,
         fetchUser,
-        checkTokenInStore,
-        resetError
+        getUserById,
+        addUser,
+        isAuthenticated,
+        resetError,
     };
 });

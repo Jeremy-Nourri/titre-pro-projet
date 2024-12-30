@@ -7,4 +7,6 @@ import lombok.Data;
 public class TagDtoRequest {
     @NotBlank(message = "Designation is required")
     private String designation;
+
+    private String color;
 }

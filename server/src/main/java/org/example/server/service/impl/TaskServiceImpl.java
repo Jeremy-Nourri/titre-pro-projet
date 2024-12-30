@@ -9,6 +9,7 @@ import org.example.server.exception.BoardColumnNotFoundException;
 import org.example.server.exception.TaskNotFoundException;
 import org.example.server.mapper.TaskMapper;
 import org.example.server.model.BoardColumn;
+import org.example.server.model.RoleEnum;
 import org.example.server.model.Task;
 import org.example.server.repository.BoardColumnRepository;
 import org.example.server.repository.TaskRepository;
@@ -26,7 +27,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public TaskDtoResponse createTask(Long projectId, Long boardColumnId, TaskDtoRequest request) {
 
@@ -50,7 +51,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public TaskDtoResponse updateTask(Long projectId, Long taskId, TaskDtoRequest request) {
 
@@ -69,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public void deleteTask(Long projectId, Long taskId) {
 
@@ -80,7 +81,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = true)
     @Transactional(readOnly = true)
     public List<TaskSimplifiedDtoResponse> getTasksByBoardColumnId(Long projectId, Long boardColumnId) {
 
@@ -95,7 +96,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = true)
     @Transactional(readOnly = true)
     public TaskDtoResponse getTaskById(Long projectId, Long taskId) {
         Task taskFound = taskRepository.findById(taskId)
@@ -105,7 +106,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public TaskDtoResponse moveTaskToColumn(Long projectId, Long taskId, Long targetColumnId) {
 

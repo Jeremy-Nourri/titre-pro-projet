@@ -1,19 +1,17 @@
-import { fetchWithAuth } from '@/api';
+import { api } from '@/api';
 import type { TagRequest, TagResponse } from '@/types/interfaces/tag';
 
 export const createTag = async (
     projectId: number,
     columnId: number,
     taskId: number,
-    tag: TagRequest,
-    token: string
+    tag: TagRequest
 ): Promise<TagResponse> => {
-    return await fetchWithAuth<TagResponse>(
-        'POST',
+    const response = await api.post<TagResponse>(
         `/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags`,
-        token,
         tag
     );
+    return response.data;
 };
 
 export const updateTag = async (
@@ -21,41 +19,32 @@ export const updateTag = async (
     columnId: number,
     taskId: number,
     tagId: number,
-    updatedTag: Partial<TagRequest>,
-    token: string
+    updatedTag: Partial<TagRequest>
 ): Promise<TagResponse> => {
-    return await fetchWithAuth<TagResponse>(
-        'PUT',
+    const response = await api.put<TagResponse>(
         `/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags/${tagId}`,
-        token,
         updatedTag
     );
+    return response.data;
 };
 
 export const deleteTag = async (
     projectId: number,
     columnId: number,
     taskId: number,
-    tagId: number,
-    token: string
+    tagId: number
 ): Promise<void> => {
-    return await fetchWithAuth<void>(
-        'DELETE',
-        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags/${tagId}`,
-        token
-    );
+    await api.delete<void>(`/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags/${tagId}`);
 };
 
 export const getTagById = async (
     projectId: number,
     columnId: number,
     taskId: number,
-    tagId: number,
-    token: string
+    tagId: number
 ): Promise<TagResponse> => {
-    return await fetchWithAuth<TagResponse>(
-        'GET',
-        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags/${tagId}`,
-        token
+    const response = await api.get<TagResponse>(
+        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}/tags/${tagId}`
     );
+    return response.data;
 };

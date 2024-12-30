@@ -2,9 +2,11 @@ package org.example.server.controller;
 
 import jakarta.validation.Valid;
 import org.example.server.dto.request.ProjectDtoRequest;
+import org.example.server.dto.request.RoleRequest;
 import org.example.server.dto.response.ProjectDtoResponse;
 import org.example.server.mapper.ProjectMapper;
 import org.example.server.model.Project;
+import org.example.server.model.RoleEnum;
 import org.example.server.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +52,8 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/users/{userId}")
-    public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @PathVariable Long userId) {
-        projectService.addUserToProject(projectId, userId);
+    public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @Valid @RequestBody RoleRequest request) {
+        projectService.addUserToProject(projectId, request.getUserEmail(), request.getRole());
         return ResponseEntity.ok("Utilisateur ajouté avec succès au projet.");
     }
 

@@ -1,16 +1,7 @@
-import { api, handleApiError, fetchWithAuth } from '@/api';
-
+import { api } from '@/api';
 import type { LoginRequest, LoginResponse } from '@/types/interfaces/login';
 
-export const login = async (credentials: LoginRequest): Promise<LoginResponse | string> => {
-    try {
-        const response = await api.post('login',credentials);
-        return response.data;
-    } catch (error) {
-        return handleApiError(error);
-    }
-};
-
-export const getUserDetails = async (userId: number, token: string): Promise<LoginResponse | string> => {
-    return await fetchWithAuth<LoginResponse>('GET', `/users/${userId}`, token);
+export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>('login', credentials);
+    return response.data;
 };

@@ -38,18 +38,22 @@ h4 {
 }
 
 .p-text {
-    @apply text-[0.7rem] sm:text-sm md:text-base lg:text-lg xl:text-lg
+    @apply text-[0.7rem] sm:text-sm md:text-base lg:text-base xl:text-lg
 }
 
 .form-input {
     @apply block w-full rounded-md bg-white pr-2 pl-3 py-2 text-primary outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 placeholder:md:text-sm/6 placeholder:text-[12px] md:text-sm/6 text-[12px] focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor
 }
 
+.button-base {
+    @apply justify-center rounded-md ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 xl:text-base/6 md:text-sm/6 text-[12px] shadow-sm
+}
+
 .button-primary {
-    @apply w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm
+    @apply button-base w-full bg-bluecolor text-white
 }
 
 .button-secondary {
-    @apply justify-center rounded-md hover:bg-bluecolor outline outline-4 outline-blue-600 bg-slate-50 hover:outline-bluecolor ease-in duration-300 pr-2 pl-3 py-2 hover:text-white text-bluecolor md:text-sm/6 text-[12px] font-medium shadow-sm
+    @apply button-base hover:bg-bluecolor outline outline-4 outline-blue-600 bg-slate-50 hover:outline-bluecolor hover:text-white text-bluecolor
 }
 

@@ -59,22 +59,22 @@ router.beforeEach(async (to) => {
     console.log('Checking route:', to.name);
     console.log('Token exists:', authStore.token);
   
-    if (to.meta.requiresAuth && (!authStore.token || !authStore.user)) {
+    router.beforeEach(async (to) => {
+        const { useAuthStore } = await import('@/stores/authStore');
+        const authStore = useAuthStore();
 
-        console.warn('Unauthorized access to a protected route:', to.name);
-
-        return {
-            path: '/',
-            query: { redirect: to.fullPath },
+        await authStore.initializeAuth();
+    
+        if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
+            return { path: '/', query: { redirect: to.fullPath } };
         }
-    }
-
-    if (to.path === '/' && to.query.redirect) {
-        router.replace({ path: '/' });
-    }
-
-    return true;
-  
+    
+        if (to.query.redirect && authStore.isAuthenticated()) {
+            return { path: to.query.redirect as string };
+        }
+    
+        return true;
+    });
 });
 
 export default router

@@ -1,53 +1,46 @@
-import { fetchWithAuth } from '@/api';
+import { api } from '@/api';
 import type { TaskRequest, TaskResponse } from '@/types/interfaces/task';
 
 export const createTask = async (
     projectId: number,
     columnId: number,
-    task: TaskRequest,
-    token: string
+    task: TaskRequest
 ): Promise<TaskResponse> => {
-    return await fetchWithAuth<TaskResponse>(
-        'POST',
+    const response = await api.post<TaskResponse>(
         `/projects/${projectId}/columns/${columnId}/tasks`,
-        token,
         task
     );
+    return response.data;
 };
 
 export const updateTask = async (
     projectId: number,
     columnId: number,
     taskId: number,
-    updatedTask: Partial<TaskRequest>,
-    token: string
+    updatedTask: Partial<TaskRequest>
 ): Promise<TaskResponse> => {
-    return await fetchWithAuth<TaskResponse>(
-        'PUT',
+    const response = await api.put<TaskResponse>(
         `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`,
-        token,
         updatedTask
     );
+    return response.data;
 };
 
 export const deleteTask = async (
     projectId: number,
     columnId: number,
-    taskId: number,
-    token: string
+    taskId: number
 ): Promise<void> => {
-    return await fetchWithAuth<void>(
-        'DELETE',
-        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`,
-        token
-    );
+    await api.delete<void>(`/projects/${projectId}/columns/${columnId}/tasks/${taskId}`);
 };
 
 export const getTaskById = async (
     projectId: number,
     columnId: number,
-    taskId: number,
-    token: string
+    taskId: number
 ): Promise<TaskResponse> => {
-    return await fetchWithAuth<TaskResponse>('GET', `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`, token);
+    const response = await api.get<TaskResponse>(
+        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`
+    );
+    return response.data;
 };
