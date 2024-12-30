@@ -2,18 +2,16 @@ package org.example.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.server.aspect.CheckProjectAuthorization;
-import org.example.server.aspect.CheckUserAuthorization;
 import org.example.server.dto.request.ProjectDtoRequest;
 import org.example.server.dto.response.ProjectDtoResponse;
-import org.example.server.exception.InvalidProjectDateException;
-import org.example.server.exception.ProjectNotFoundException;
-import org.example.server.exception.UserAlreadyAssignedException;
-import org.example.server.exception.UserNotFoundException;
+import org.example.server.exception.*;
 import org.example.server.mapper.ProjectMapper;
 import org.example.server.model.Project;
+import org.example.server.model.RoleEnum;
 import org.example.server.model.User;
 import org.example.server.model.UserProject;
 import org.example.server.repository.ProjectRepository;
+import org.example.server.repository.UserProjectRepository;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.ProjectService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final UserProjectRepository userProjectRepository;
 
     @Override
     @Transactional
@@ -50,11 +49,14 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
         Project savedProject = projectRepository.save(project);
+
+        assignRoleToUserInProject(project.getId(), currentUser.getUsername(), RoleEnum.ADMIN);
+
         return ProjectMapper.ProjectToProjectDtoResponse(savedProject);
     }
 
     @Override
-    @CheckUserAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = false)
     @Transactional(readOnly = true)
     public List<ProjectDtoResponse> getProjectsByUserId(Long userId) {
 
@@ -67,7 +69,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public ProjectDtoResponse updateProject(Long projectId, ProjectDtoRequest request) {
 
@@ -99,7 +101,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
     public void deleteProject(Long projectId) {
         Project existingProject = projectRepository.findById(projectId)
@@ -108,35 +110,52 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.delete(existingProject);
     }
 
+
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
     @Transactional
-    public void addUserToProject(Long projectId, Long userId) {
+    public void addUserToProject(Long projectId, String userEmail, RoleEnum role) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
+                .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec ID : " + projectId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec ID " + userId + " non trouvé"));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'email : " + userEmail));
 
-        boolean userAlreadyAssigned = project.getUserProjects().stream()
-                .anyMatch(userProject -> userProject.getUser().getId().equals(userId));
-
-        if (userAlreadyAssigned) {
-            throw new UserAlreadyAssignedException("L'utilisateur est déjà assigné à ce projet.");
+        if (userProjectRepository.findByUserAndProject(user, project).isPresent()) {
+            throw new IllegalArgumentException("Cet utilisateur est déjà associé à ce projet.");
         }
 
         UserProject userProject = UserProject.builder()
                 .user(user)
                 .project(project)
+                .role(role)
                 .userAddAt(LocalDate.now())
                 .build();
 
-        project.getUserProjects().add(userProject);
-        projectRepository.save(project);
+        userProjectRepository.save(userProject);
     }
 
     @Override
-    @CheckProjectAuthorization
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
+    @Transactional
+    public void assignRoleToUserInProject(Long projectId, String userEmail, RoleEnum role) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec ID : " + projectId));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'email : " + userEmail));
+
+        UserProject userProject = UserProject.builder()
+                .user(user)
+                .project(project)
+                .role(role)
+                .userAddAt(LocalDate.now())
+                .build();
+
+        userProjectRepository.save(userProject);
+    }
+
+    @Override
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = true)
     @Transactional(readOnly = true)
     public ProjectDtoResponse getProjectById(Long projectId) {
         Project projectFound =  projectRepository.findByIdWithColumns(projectId)

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
 import org.example.server.exception.InvalidCredentialsException;
+import org.example.server.mapper.ProjectMapper;
+import org.example.server.mapper.UserProjectMapper;
 import org.example.server.model.User;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.LoginService;
@@ -11,7 +13,7 @@ import org.example.server.security.JwtTokenUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,15 +33,29 @@ public class LoginServiceImpl implements LoginService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        return LoginDtoResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .position(String.valueOf(user.getPosition()))
-                .createdDate(user.getCreatedDate())
-                .updatedDate(user.getUpdatedDate())
-                .token(jwtTokenUtil.generateToken(user.getEmail(), user.getId()))
-                .build();
+        LoginDtoResponse response = new LoginDtoResponse();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setPosition(String.valueOf(user.getPosition()));
+        response.setCreatedDate(user.getCreatedDate());
+        response.setUpdatedDate(user.getUpdatedDate());
+
+        if (user.getCreatedProjects() != null) {
+            response.setCreatedProjects(user.getCreatedProjects().stream()
+                    .map(ProjectMapper::ProjectToProjectDtoResponse)
+                    .collect(Collectors.toList()));
+        }
+
+        if (user.getUserProjects() != null) {
+            response.setUserProjects(user.getUserProjects().stream()
+                    .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)
+                    .collect(Collectors.toList()));
+        }
+
+        response.setToken(jwtTokenUtil.generateToken(user.getEmail(), user.getId()));
+
+        return response;
     }
 }

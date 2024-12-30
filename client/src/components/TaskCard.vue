@@ -24,20 +24,11 @@ const showDeleteConfirmation = ref(false);
 
 const handleUpdateTask = async (updatedTask: TaskRequest) => {
     try {
-        if (!authStore.user?.id) {
-            throw new Error('Utilisateur non authentifié');
-        } else if (!authStore?.token) {
-            throw new Error('Token non fourni');
-        } 
-        await projectStore.updateTaskDetails(
-            props.columnId,
-            props.task.id,
-            updatedTask,
-            authStore.token
-        );
+        await projectStore.updateTaskDetails(props.columnId, props.task.id, updatedTask);
         emit('task-updated');
         showUpdateForm.value = false;
         showDetailsModal.value = false;
+
     } catch (error) {
         console.error('Erreur lors de la mise à jour de la tâche :', error);
     }
@@ -50,10 +41,11 @@ const handleDeleteTask = async () => {
         } else if (!authStore?.token) {
             throw new Error('Token non fourni');
         } 
-        await projectStore.removeTask(props.columnId, props.task.id, authStore.token);
+        await projectStore.removeTask(props.columnId, props.task.id);
         emit('task-deleted', props.task.id);
         showDeleteConfirmation.value = false;
         showDetailsModal.value = false;
+
     } catch (error) {
         console.error('Erreur lors de la suppression de la tâche :', error);
     }
@@ -62,7 +54,7 @@ const handleDeleteTask = async () => {
 
 <template>
     <div
-        class="task-card bg-white shadow rounded-md p-4 mb-4 cursor-pointer hover:shadow-lg"
+        class="task-card bg-white shadow rounded-md p-4 mb-4 cursor-pointer hover:scale-105 hover:shadow-lg ease-in duration-300"
         @click="showDetailsModal = true"
     >
         <h4 class="">{{ task.title }}</h4>
@@ -86,13 +78,13 @@ const handleDeleteTask = async () => {
             </p>
             <div class="flex justify-end gap-4 mt-4">
                 <button
-                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    class="button-base bg-bluecolor text-white"
                     @click="showUpdateForm = true"
                 >
                     Modifier
                 </button>
                 <button
-                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    class="button-base bg-red-500 text-white hover:opacity-70"
                     @click="showDeleteConfirmation = true"
                 >
                     Supprimer
@@ -117,13 +109,13 @@ const handleDeleteTask = async () => {
             </p>
             <div class="flex justify-center gap-4">
                 <button
-                    class="px-4 py-2 bg-gray-400 rounded hover:bg-gray-400"
+                    class="button-base bg-gray-500 hover:opacity-70"
                     @click="showDeleteConfirmation = false"
                 >
                     Annuler
                 </button>
                 <button
-                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    class="button-base bg-red-500 text-white rounded hover:opacity-70"
                     @click="handleDeleteTask"
                 >
                     Supprimer

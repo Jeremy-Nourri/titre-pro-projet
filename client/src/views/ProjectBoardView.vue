@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useProjectStore } from '@/stores/projectStore';
-import { useAuthStore } from '@/stores/authStore';
 import { useRoute } from 'vue-router';
 import FormInput from '@/components/ui/FormInput.vue';
 import BoardColumn from '@/components/BoardColumn.vue';
 import ReusableModal from '@/components/ui/ReusableModal.vue';
+import { PlusCircleIcon } from '@heroicons/vue/20/solid'
 import type { BoardColumnRequest } from '@/types/interfaces/boardColumn';
 
 const projectStore = useProjectStore();
-const authStore = useAuthStore();
 
 const route = useRoute();
 
@@ -30,18 +29,20 @@ const { handleSubmit, errors } = useForm<BoardColumnRequest>({
 
 const { value: name } = useField<string>('name');
 
+const canAddColumn = computed(() => {
+    const boardColumns = projectStore.projectState?.boardColumns;
+    return boardColumns && boardColumns.length < 4 && !showAddColumnForm.value;
+});
+
+
 onMounted(async () => {
     try {
-        console.log(route.params.id);
         if (!route.params.id) {
             throw new Error('ID de projet non fourni dans les paramètres');
         }
         const paramId = Number(route.params.id);
 
-        if (!authStore.token) {
-            throw new Error('Token d\'authentification manquant');
-        }
-        await projectStore.fetchProjectById(paramId, authStore.token);
+        await projectStore.fetchProjectById(paramId);
     }
     catch (err) {
         console.error('Erreur lors de la récupération du projet :', err);
@@ -50,12 +51,6 @@ onMounted(async () => {
 
 const onSubmit = handleSubmit(async (values) => {
     try {
-        if (!authStore.user?.id) {
-            throw new Error('Utilisateur non authentifié');
-        } else if (!authStore?.token) {
-            throw new Error('Token non fourni');
-        }
-
         const paramId = Number(route.params.id);
 
         const newColumn: BoardColumnRequest = {
@@ -64,8 +59,9 @@ const onSubmit = handleSubmit(async (values) => {
             tasks: []
         }
 
-        await projectStore.addColumn(newColumn, authStore.token);
+        await projectStore.addColumn(newColumn);
         showAddColumnForm.value = false;
+        
     } catch (error) {
         console.error('Erreur lors de la soumission du formulaire :', error);
 
@@ -74,16 +70,32 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-    <div class="bg-gray-100 min-h-screen p-4">
+    <main class="bg-gray-100 min-h-screen md:p-7 p-2">
         <h1 class="text-center mb-8">
             Projet : {{ projectStore.projectState?.name || 'Chargement...' }}
         </h1>
+        <div v-if="canAddColumn" class="flex justify-end mx-auto mb-6">
+            <button
+                class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
+                 ease-in duration-300 lg:p-1.5 p-0.5"
+                title="Ajouter une colonne"
+                @click="showAddColumnForm = true"
+                
+            >
+                <PlusCircleIcon class="xl:size-6 size-5 text-white group-hover:text-bluecolor ease-in duration-300" />
+            </button>
+        </div>
+        <div v-else class="mb-6">
+            <p class="text-gray-500 md:text-sm md:text-right text-xs text-center">
+                Vous avez atteint la limite de 4 colonnes
+            </p>
+        </div>
 
         <div v-if="projectStore.isLoading" class="text-center">
             <p>Chargement des colonnes...</p>
         </div>
 
-        <div v-else class="w-11/12 bg-slate-500 md:flex gap-4 mx-auto p-4">
+        <div v-else class="min-h-72 max-h-full overflow-auto bg-slate-200 lg:flex lg:flex-nowrap md:flex md:flex-wrap md:justify-center gap-4 mx-auto p-4">
             <BoardColumn
                 v-for="column in projectStore.projectState?.boardColumns || []"
                 :key="column.id"
@@ -94,13 +106,6 @@ const onSubmit = handleSubmit(async (values) => {
         </div>
 
         <div class="mt-6 text-center">
-            <button
-                v-if="!showAddColumnForm"
-                class="button-secondary "
-                @click="showAddColumnForm = true"
-            >
-                Ajouter une colonne
-            </button>
             <ReusableModal v-model="showAddColumnForm">
                 <template #default>
                     <div class="p-4">
@@ -112,7 +117,7 @@ const onSubmit = handleSubmit(async (values) => {
                                 placeholder="Entrez le nom de la colonne"
                                 :error="errors.name"
                             />
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4">
+                            <button type="submit" class="bg-bluecolor text-white button-base mt-4">
                                 Ajouter
                             </button>
                         </form>
@@ -120,5 +125,5 @@ const onSubmit = handleSubmit(async (values) => {
                 </template>
             </ReusableModal>
         </div>
-    </div>
-</template>&
+    </main>
+</template>

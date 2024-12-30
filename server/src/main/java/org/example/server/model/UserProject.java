@@ -35,6 +35,10 @@ public class UserProject {
     @Column(nullable = false)
     private LocalDate userAddAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoleEnum role;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDate createdDate;

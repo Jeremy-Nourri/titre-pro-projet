@@ -15,4 +15,5 @@ public class UserSimplifiedDtoResponse {
     private String lastName;
     private String email;
     private String position;
+    private String role;
 }

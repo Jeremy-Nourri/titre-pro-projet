@@ -9,22 +9,22 @@ import * as yup from 'yup';
 import { Position, type UserRequest } from '@/types/interfaces/user';
 import LogoProjectFlow from '@/assets/img/logo-project-flow.webp';
 import FormInput from './ui/FormInput.vue';
-import { useUserStore } from '@/stores/userStore';
+import { useAuthStore } from '@/stores/authStore';
 
-const emit = defineEmits<{(event: 'changeComponent', component: string): void;}>();
+const authStore = useAuthStore();
 
-const userStore = useUserStore();
+const emit = defineEmits<{ (event: 'change-component', component: string): void }>();
 
 onMounted(() => {
-    userStore.resetError();
+    authStore.resetError();
 });
 
 onBeforeUnmount(() => {
-    userStore.resetError();
+    authStore.resetError();
 });
 
 setInterval(() => {
-    userStore.resetError();
+    authStore.resetError();
 }, 30000);
 
 const positions = Object.entries(Position).map(([value, label]) => ({ value, label }));
@@ -65,9 +65,9 @@ type UserForm = UserRequest & { confirmPassword: string };
 const onSubmit = handleSubmit(async (values: UserForm) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...userData } = values;
-    await userStore.addUser(userData as UserRequest);
-    if (!userStore.error) {
-        emit('changeComponent', 'login');
+    await authStore.addUser(userData as UserRequest);
+    if (!authStore.error) {
+        emit('change-component', 'login');
     }
 });
 
@@ -122,16 +122,18 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
                 
                 <FormInput v-model="confirmPassword" type="password" label="Confirmation du mot de passe" placeholder="Entrez votre mot de passe" autocomplete="off" :error="errors.confirmPassword" />
 
-                <p v-if="userStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
-                    {{ userStore.error === '409' ? "Email déjà utilisé" : "Une erreur est survenue, veuillez réessayer ultérieurement" }}
+                <p v-if="authStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
+                    {{ authStore.error === '409' ? "Email déjà utilisé" : "Une erreur est survenue, veuillez réessayer ultérieurement" }}
                 </p>
 
                 <div class="my-6 ">
-                    <button type="submit" class=" w-full justify-center rounded-md bg-bluecolor ease-in duration-300 hover:opacity-70 pr-2 pl-3 py-2 text-white md:text-sm/6 text-[12px] shadow-sm">Enregistrer</button>
+                    <button type="submit" class="button-primary">
+                        Enregistrer
+                    </button>
                 </div>
             </form>
         </div>
-        <button class="block mx-auto md:text-sm/6 text-[12px] text-bluecolor hover:opacity-80 ease-in duration-300 underline" @click="emit('changeComponent', 'login')" >
+        <button class="block mx-auto md:text-sm/6 text-[12px] text-bluecolor hover:opacity-80 ease-in duration-300 underline" @click="emit('change-component', 'login')" >
             Se connecter
         </button>
     </div>

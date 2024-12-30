@@ -1,22 +1,28 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-import type { ProjectResponse, ProjectRequest } from '@/types/interfaces/project';
-import type { BoardColumnRequest } from '@/types/interfaces/boardColumn';
-import type { TaskRequest } from '@/types/interfaces/task';
-import type { TagRequest } from '@/types/interfaces/tag';
+import type { ProjectResponse, ProjectRequest } from "@/types/interfaces/project";
+import type { BoardColumnRequest } from "@/types/interfaces/boardColumn";
+import type { TaskRequest } from "@/types/interfaces/task";
 
-import { getProjectById, createProject } from '@/services/projectService';
-import { createColumn, updateColumn, deleteColumn } from '@/services/boardColumnService';
-import { createTask, updateTask, deleteTask } from '@/services/taskService';
-import { createTag, updateTag, deleteTag } from '@/services/tagService';
+import {
+    getProjectById,
+    createProject,
+} from "@/services/projectService";
+import {
+    createColumn,
+    updateColumn,
+    deleteColumn,
+} from "@/services/boardColumnService";
+import {
+    createTask,
+    updateTask,
+    deleteTask,
+} from "@/services/taskService";
 
-import { useAuthStore } from './authStore';
-
-export const useProjectStore = defineStore('project', () => {
+export const useProjectStore = defineStore("project", () => {
     const router = useRouter();
-    const authStore = useAuthStore();
 
     const projectState = ref<ProjectResponse | null>(null);
     const isLoading = ref(false);
@@ -26,227 +32,114 @@ export const useProjectStore = defineStore('project', () => {
         error.value = null;
     };
 
-    const getProjectId = () => {
+    const handleError = (err: unknown): string => {
+        if (err instanceof Error) {
+            return err.message;
+        }
+        return "Une erreur inattendue s'est produite.";
+    };
+
+    const getProjectId = (): number => {
         if (!projectState.value?.id) {
-            throw new Error('Project ID is introuvable.');
+            throw new Error("Project ID est introuvable.");
         }
         return projectState.value.id;
     };
-    
 
-    const addProject = async (project: ProjectRequest, token: string) => {
+    const addProject = async (project: ProjectRequest) => {
         isLoading.value = true;
         resetError();
-        authStore.checkTokenInStore();
-
-        const response = await createProject(project, token);
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
+        try {
+            const response = await createProject(project);
             projectState.value = response;
             router.push({
-                name: 'ProjectBoardView',
+                name: "ProjectBoardView",
                 params: { id: projectState.value?.id },
             });
+            return response;
+        } catch (err) {
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
-        isLoading.value = false;
-        return response;
     };
 
-    const fetchProjectById = async (projectId: number, token: string) => {
+    const fetchProjectById = async (projectId: number) => {
         isLoading.value = true;
         resetError();
-        const response = await getProjectById(projectId, token);
-
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
+        try {
+            const response = await getProjectById(projectId);
             projectState.value = response;
-        }
-
-        isLoading.value = false;
-        return response;
-    };
-
-    const addColumn = async (column: BoardColumnRequest, token: string) => {
-        if (!projectState.value) return;
-    
-        const response = await createColumn(column.projectId, column, token);
-        console.log('Nouvelle colonne créée :', response);
-    
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-
-            if (!projectState.value.boardColumns) {
-                projectState.value.boardColumns = [];
-            }
-            projectState.value.boardColumns = [...projectState.value.boardColumns, response];
-    
-            await fetchProjectById(column.projectId, token);
+            return response;
+        } catch (err) {
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
     };
-    
-    const updateColumnName = async (columnId: number, name: string, token: string) => {
-        const projectId = getProjectId();
-        const response = await updateColumn(projectId, columnId, { name }, token);
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            const column = projectState.value?.boardColumns.find(col => col.id === columnId);
+
+    const addColumn = async (column: BoardColumnRequest) => {
+        try {
+            const response = await createColumn(column.projectId, column);
+            projectState.value?.boardColumns.push(response);
+            await fetchProjectById(column.projectId);
+        } catch (err) {
+            error.value = handleError(err);
+        }
+    };
+
+    const updateColumnName = async (columnId: number, name: string) => {
+        try {
+            const projectId = getProjectId();
+            await updateColumn(projectId, columnId, { name });
+            const column = projectState.value?.boardColumns.find((col) => col.id === columnId);
             if (column) column.name = name;
+        } catch (err) {
+            error.value = handleError(err);
         }
     };
-    
-    const removeColumn = async (columnId: number, token: string) => {
-        const projectId = getProjectId();
-        const response = await deleteColumn(projectId, columnId, token);
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            projectState.value!.boardColumns = projectState.value!.boardColumns.filter(col => col.id !== columnId);
-        }
-    };
-    
-    const addTask = async (columnId: number, task: TaskRequest, token: string) => {
-        const projectId = getProjectId();
-        const response = await createTask(projectId, columnId, task, token);
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            const column = projectState.value?.boardColumns.find(col => col.id === columnId);
-            if (column) column.tasks.push(response);
-        }
-    };
-    
-    const updateTaskDetails = async (
-        columnId: number,
-        taskId: number,
-        updatedTask: Partial<TaskRequest>,
-        token: string
-    ) => {
-        const projectId = getProjectId();
-        const response = await updateTask(projectId, columnId, taskId, updatedTask, token);
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            projectState.value?.boardColumns.forEach(col => {
-                const task = col.tasks.find(t => t.id === taskId);
-                if (task) Object.assign(task, response);
-            });
-        }
-    };
-    
-    const removeTask = async (columnId: number, taskId: number, token: string) => {
-        const projectId = getProjectId();
-        console.log("entering removeTask")
-        await deleteTask(projectId, columnId, taskId, token);
 
-        projectState.value?.boardColumns.forEach((col) => {
-            const index = col.tasks.findIndex((t) => t.id === taskId);
-            if (index !== -1) {
-                col.tasks.splice(index, 1);
-            }
-        })
-        console.log("deleted tasks")
-        
-    };
-    
-    
-    const addTag = async (
-        columnId: number,
-        taskId: number,
-        tag: TagRequest,
-        token: string
-    ) => {
-        const projectId = getProjectId();
-        const response = await createTag(projectId, columnId, taskId, tag, token);
-    
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            const column = projectState.value?.boardColumns.find(col => col.id === columnId);
-            const task = column?.tasks.find(t => t.id === taskId);
-    
-            if (task) task.tags.push(response);
+    const removeColumn = async (columnId: number) => {
+        try {
+            const projectId = getProjectId();
+            const response = await deleteColumn(projectId, columnId);
+            projectState.value = response;
+        } catch (err) {
+            error.value = handleError(err);
         }
     };
-    
-    
-    const updateTagDetails = async (
-        columnId: number,
-        taskId: number,
-        tagId: number,
-        updatedTag: Partial<TagRequest>,
-        token: string
-    ) => {
-        const projectId = getProjectId();
-        const response = await updateTag(projectId, columnId, taskId, tagId, updatedTag, token);
-    
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            const column = projectState.value?.boardColumns.find(col => col.id === columnId);
-            const task = column?.tasks.find(t => t.id === taskId);
-            const tag = task?.tags.find(t => t.id === tagId);
-    
-            if (tag) Object.assign(tag, response);
+
+    const addTask = async (columnId: number, task: TaskRequest) => {
+        try {
+            const projectId = getProjectId();
+            const response = await createTask(projectId, columnId, task);
+            const column = projectState.value?.boardColumns.find((col) => col.id === columnId);
+            if (column) column.tasks.push(response);
+        } catch (err) {
+            error.value = handleError(err);
         }
     };
-    
-    
-    const removeTag = async (
-        columnId: number,
-        taskId: number,
-        tagId: number,
-        token: string
-    ) => {
-        const projectId = getProjectId();
-        const response = await deleteTag(projectId, columnId, taskId, tagId, token);
-    
-        if (typeof response === 'string') {
-            error.value = response;
-        } else {
-            const column = projectState.value?.boardColumns.find(col => col.id === columnId);
-            const task = column?.tasks.find(t => t.id === taskId);
-    
-            if (task) task.tags = task.tags.filter(t => t.id !== tagId);
+
+    const updateTaskDetails = async (columnId: number, taskId: number, updatedTask: Partial<TaskRequest>) => {
+        try {
+            const projectId = getProjectId();
+            const response = await updateTask(projectId, columnId, taskId, updatedTask);
+            const column = projectState.value?.boardColumns.find((col) => col.id === columnId);
+            const task = column?.tasks.find((t) => t.id === taskId);
+            if (task) Object.assign(task, response);
+        } catch (err) {
+            error.value = handleError(err);
         }
-    };    
-    
-    const moveTaskToColumn = async (
-        taskId: number,
-        sourceColumnId: number,
-        destinationColumnId: number,
-        token: string
-    ) => {
-        const projectId = getProjectId();
-        const sourceColumn = projectState.value?.boardColumns.find(col => col.id === sourceColumnId);
-        const destinationColumn = projectState.value?.boardColumns.find(col => col.id === destinationColumnId);
-    
-        if (sourceColumn && destinationColumn) {
-            const taskIndex = sourceColumn.tasks.findIndex(task => task.id === taskId);
-    
-            if (taskIndex !== -1) {
-                
-                const [movedTask] = sourceColumn.tasks.splice(taskIndex, 1);
-                movedTask.columnBoardId = destinationColumnId;
-    
-                const response = await updateTask(
-                    projectId,
-                    sourceColumnId,
-                    taskId,
-                    { columnBoardId: destinationColumnId },
-                    token
-                );
-    
-                if (typeof response === 'string') {
-                    error.value = response;
-                    sourceColumn.tasks.splice(taskIndex, 0, movedTask);
-                } else {
-                    destinationColumn.tasks.push(response);
-                }
-            }
+    };
+
+    const removeTask = async (columnId: number, taskId: number) => {
+        try {
+            const projectId = getProjectId();
+            await deleteTask(projectId, columnId, taskId);
+            const column = projectState.value?.boardColumns.find((col) => col.id === columnId);
+            if (column) column.tasks = column.tasks.filter((task) => task.id !== taskId);
+        } catch (err) {
+            error.value = handleError(err);
         }
     };
 
@@ -262,9 +155,5 @@ export const useProjectStore = defineStore('project', () => {
         addTask,
         updateTaskDetails,
         removeTask,
-        addTag,
-        updateTagDetails,
-        removeTag,
-        moveTaskToColumn,
     };
 });

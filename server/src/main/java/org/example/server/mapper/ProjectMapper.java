@@ -27,7 +27,7 @@ public class ProjectMapper {
 
         if (project.getUserProjects() != null) {
             dto.setUsers(project.getUserProjects().stream()
-                    .map(userProject -> UserMapper.toSimplifiedDto(userProject.getUser()))
+                    .map(UserMapper::toSimplifiedDto)
                     .collect(Collectors.toList()));
         }
 
@@ -36,8 +36,8 @@ public class ProjectMapper {
                     .map(BoardColumnMapper::toResponseDTO)
                     .collect(Collectors.toList()));
         }
+
         return dto;
     }
-
 
 }

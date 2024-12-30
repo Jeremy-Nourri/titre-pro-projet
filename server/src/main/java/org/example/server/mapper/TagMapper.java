@@ -9,6 +9,7 @@ public class TagMapper {
         TagDtoResponse dto = new TagDtoResponse();
         dto.setId(tag.getId());
         dto.setDesignation(tag.getDesignation());
+        dto.setColor(tag.getColor());
         dto.setTaskId(tag.getTask().getId());
         dto.setCreatedDate(tag.getCreatedDate());
         dto.setUpdatedDate(tag.getUpdatedDate());

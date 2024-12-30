@@ -1,34 +1,25 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import { useUserStore } from '@/stores/userStore';
 import ProjectCard from '@/components/ProjectCard.vue';
 import UserProjectCard from '@/components/UserProjectCard.vue';
 
 const authStore = useAuthStore();
-const userStore = useUserStore();
 
-const fetchUserData = async () =>{
+const fetchUserData = async () => {
     try {
-        if (!authStore.user?.id) {
-            throw new Error('Utilisateur non authentifié');
-        } else if (!authStore?.token) {
-            throw new Error('Token non fourni');
-        } 
-
-        await userStore.getUserById(authStore.user.id, authStore.token);
+        await authStore.fetchUser();
     } catch (err) {
         console.error('Erreur lors de la récupération des informations utilisateur:', err);
     }
-}
+};
 
 onMounted(() => {
     fetchUserData();
 });
 
-const createdProjects = computed(() => userStore.user?.createdProjects ?? []);
-const userProjects = computed(() => userStore.user?.userProjects ?? []);
-
+const createdProjects = computed(() => authStore.user?.createdProjects ?? []);
+const userProjects = computed(() => authStore.user?.userProjects ?? []);
 </script>
 
 <template>
@@ -43,7 +34,7 @@ const userProjects = computed(() => userStore.user?.userProjects ?? []);
         </div>
         <div v-else>Aucun projet créé.</div>
 
-        <h4 class="mb-4">Mes projets en tant que participant</h4>
+        <h4 class="mb-4 mt-8">Mes projets en tant que participant</h4>
         <div v-if="userProjects.length > 0" class="flex">
             <UserProjectCard
                 v-for="project in userProjects"

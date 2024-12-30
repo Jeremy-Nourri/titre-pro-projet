@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.server.dto.request.BoardColumnDtoRequest;
 import org.example.server.dto.response.BoardColumnDtoResponse;
+import org.example.server.dto.response.ProjectDtoResponse;
 import org.example.server.service.BoardColumnService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,11 +46,11 @@ public class BoardColumnController {
     }
 
     @DeleteMapping("/{columnId}")
-    public ResponseEntity<Void> deleteBoardColumn(
+    public ResponseEntity<ProjectDtoResponse> deleteBoardColumn(
             @PathVariable Long projectId,
             @PathVariable Long columnId
     ) {
-        boardColumnService.deleteBoardColumn(projectId, columnId);
-        return ResponseEntity.noContent().build();
+        ProjectDtoResponse response = boardColumnService.deleteBoardColumn(projectId, columnId);
+        return ResponseEntity.ok(response);
     }
 }

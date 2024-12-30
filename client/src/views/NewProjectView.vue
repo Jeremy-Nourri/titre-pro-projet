@@ -41,8 +41,6 @@ const onSubmit = handleSubmit(async (values: Project) => {
     try {
         if (!authStore.user?.id) {
             throw new Error('Utilisateur non authentifié');
-        } else if (!authStore?.token) {
-            throw new Error('Token non fourni');
         }
 
         const project: ProjectRequest = {
@@ -50,7 +48,7 @@ const onSubmit = handleSubmit(async (values: Project) => {
             createdBy: authStore.user.id,
         }
 
-        await projectStore.addProject(project, authStore.token)
+        await projectStore.addProject(project)
 
     } catch (error) {
         console.error('Erreur lors de la soumission du formulaire:', error);
