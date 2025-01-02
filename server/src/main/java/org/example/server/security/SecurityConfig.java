@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/login", "/api/users/register").permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -81,7 +82,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        log.info("Creating JwtAuthenticationFilter bean");
+        log.info("Création du JwtAuthenticationFilter bean");
 
         return new JwtAuthenticationFilter(jwtTokenUtil, userRepository);
     }

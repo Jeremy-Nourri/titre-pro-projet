@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { jwtDecode } from "jwt-decode";
 import type { LoginRequest, LoginResponse } from "@/types/interfaces/login";
-import { login } from "@/services/authService";
+import { login, logout } from "@/services/authService";
 import { createUser, getUserDetails } from "@/services/userService";
 import { useRouter } from "vue-router";
 import type { UserRequest } from "@/types/interfaces/user";
@@ -74,10 +74,19 @@ export const useAuthStore = defineStore("authStore", () => {
     };
 
     const signout = async () => {
-        token.value = null;
-        user.value = null;
-        localStorage.removeItem("token");
-        await router.push({ name: "HomeView" });
+        try {
+            await logout();
+            token.value = null;
+            user.value = null;
+            localStorage.removeItem("token");
+            await router.push({ name: "HomeView" });
+
+        } catch (err) {
+            console.error("Erreur lors de la déconnexion:", err);
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
+        }
     };
 
     const fetchUser = async () => {
@@ -140,8 +149,6 @@ export const useAuthStore = defineStore("authStore", () => {
             } else {
                 await signout();
             }
-        } else {
-            await signout();
         }
     };
 

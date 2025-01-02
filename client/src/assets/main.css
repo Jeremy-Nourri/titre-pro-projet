@@ -41,6 +41,10 @@ h4 {
     @apply text-[0.7rem] sm:text-sm md:text-base lg:text-base xl:text-lg
 }
 
+.p-text-small {
+    @apply text-[0.5rem] sm:text-xs md:text-sm lg:text-base xl:text-base
+}
+
 .form-input {
     @apply block w-full rounded-md bg-white pr-2 pl-3 py-2 text-primary outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 placeholder:md:text-sm/6 placeholder:text-[12px] md:text-sm/6 text-[12px] focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor
 }

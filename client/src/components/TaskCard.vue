@@ -50,6 +50,7 @@ const handleDeleteTask = async () => {
         console.error('Erreur lors de la suppression de la tâche :', error);
     }
 };
+
 </script>
 
 <template>
@@ -59,6 +60,9 @@ const handleDeleteTask = async () => {
     >
         <h4 class="">{{ task.title }}</h4>
         <p class="p-text text-gray-600 truncate">{{ task.detail }}</p>
+        <div class="mt-2 flex justify-end">
+            <p class="text-[0.5rem] sm:text-xs md:text-sm lg:text-base xl:text-base px-1 pt-0.5 pb-1 rounded-md" :style="{ backgroundColor: task.tagColor }">{{ task.tag }}</p>
+        </div>
     </div>
 
     <ReusableModal v-model="showDetailsModal">

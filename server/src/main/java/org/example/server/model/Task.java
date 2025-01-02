@@ -1,8 +1,8 @@
 package org.example.server.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@ToString(exclude = {"users", "tags", "boardColumn"})
+@ToString(exclude = {"project", "users"})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,10 +26,10 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(length = 1000)
+    @Column(length = 300)
     private String detail;
 
     @Enumerated(EnumType.STRING)
@@ -43,14 +43,6 @@ public class Task {
     @Column(nullable = false)
     private LocalDate dueDate;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDate createdAt;
-
-    @LastModifiedDate
-    @Column
-    private LocalDate updatedAt;
-
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "user_task",
@@ -59,14 +51,17 @@ public class Task {
     )
     private List<User> users;
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tag> tags;
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_column_id")
     @JsonBackReference
     private BoardColumn boardColumn;
+
+    @Column(nullable = false, length = 20)
+    private String tag;
+
+    @Column(nullable = false, length = 7)
+    @Pattern(regexp = "^#(?:[0-9a-fA-F]{3}){1,2}$", message = "La couleur doit être une valeur hexadecimal")
+    private String tagColor;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

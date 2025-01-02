@@ -9,7 +9,6 @@ import { useProjectStore } from '@/stores/projectStore';
 const authStore = useAuthStore();
 const projectStore = useProjectStore();
 
-
 const schema = yup.object({
     name: yup
         .string()

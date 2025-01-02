@@ -1,6 +1,7 @@
 import type { TaskResponse } from "./task";
 
 export interface BoardColumnRequest {
+  id?: number;
   name: string;
   projectId: number;
   tasks?: TaskResponse[];

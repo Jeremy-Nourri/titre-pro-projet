@@ -43,6 +43,8 @@ public class TaskServiceImpl implements TaskService {
                 .taskStatus(request.getTaskStatus())
                 .dueDate(request.getDueDate())
                 .boardColumn(boardColumn)
+                .tag(request.getTag())
+                .tagColor(request.getTagColor())
                 .build();
 
         Task taskSaved = taskRepository.save(task);
@@ -58,15 +60,21 @@ public class TaskServiceImpl implements TaskService {
         Task existingTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Tâche non trouvée avec ID : " + taskId));
 
+        BoardColumn boardColumn = boardColumnRepository.findById(request.getBoardColumnId())
+                .orElseThrow(() -> new BoardColumnNotFoundException(
+                        "Colonne non trouvée avec ID : " + request.getBoardColumnId())
+                );
+
         if (request.getTitle() != null) existingTask.setTitle(request.getTitle());
         if (request.getDetail() != null) existingTask.setDetail(request.getDetail());
         if (request.getPriority() != null) existingTask.setPriority(request.getPriority());
         if (request.getTaskStatus() != null) existingTask.setTaskStatus(request.getTaskStatus());
         if (request.getDueDate() != null) existingTask.setDueDate(request.getDueDate());
+        if (request.getBoardColumnId() != null) existingTask.setBoardColumn(boardColumn);
+        if (request.getTag() != null) existingTask.setTag(request.getTag());
+        if (request.getTagColor() != null) existingTask.setTagColor(request.getTagColor());
 
-        Task savedTask = taskRepository.save(existingTask);
-
-        return TaskMapper.taskToTaskDtoResponse(savedTask);
+        return TaskMapper.taskToTaskDtoResponse(existingTask);
     }
 
     @Override

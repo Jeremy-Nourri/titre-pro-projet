@@ -25,10 +25,10 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(length = 500)
+    @Column(length = 100)
     private String description;
 
     @Column(nullable = false)

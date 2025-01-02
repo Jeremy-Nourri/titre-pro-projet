@@ -3,24 +3,48 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import LogoProjectFlowBlue from '@/assets/img/logo-project-flow-blue.webp';
 import Avatar from '@/assets/img/avatar.png';
+import { useAuthStore } from '@/stores/authStore';
+import { ref } from 'vue';
+
+const authStore = useAuthStore();
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', current: true },
     { name: 'Créer un projet', href: '/nouveau-projet', current: false },
     { name: 'Mes projets', href: '/projects', current: false },
 ];
+
+const isOpenMenuMobile = ref<boolean>(false);
+
+const handleMenuToggle = () => {
+    isOpenMenuMobile.value =!isOpenMenuMobile.value;
+}
+
+const closeMenuAfterNavigation = () => {
+    isOpenMenuMobile.value = false;
+};
+
+
+const handleSignout = () => {
+    authStore.signout();
+}
+
 </script>
 
 <template>
-    <Disclosure v-slot="{ open }" as="nav" class="bg-bluecolor">
+    <Disclosure as="nav" class="bg-bluecolor">
         <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             <div class="relative flex h-16 items-center justify-between">
                 <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
 
-                    <DisclosureButton class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <DisclosureButton
+                        class="relative inline-flex items-center justify-center rounded-md
+                        p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                        @click="handleMenuToggle"
+                    >
                         <span class="absolute -inset-0.5" />
                         <span class="sr-only">Open main menu</span>
-                        <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
+                        <Bars3Icon v-if="isOpenMenuMobile" class="block size-6" aria-hidden="true" />
                         <XMarkIcon v-else class="block size-6" aria-hidden="true" />
                     </DisclosureButton>
                 </div>
@@ -69,6 +93,7 @@ const navigation = [
                                     <a
                                         href="#"
                                         :class="[active ? 'bg-gray-100 outline-none' : '', 'block px-4 py-2 text-sm text-gray-700']"
+                                        @click="handleSignout"
                                     >
                                         Déconnexion
                                     </a>
@@ -82,16 +107,17 @@ const navigation = [
 
         <DisclosurePanel class="sm:hidden">
             <div class="space-y-1 px-2 pb-3 pt-2">
-                <DisclosureButton
+                <router-link
                     v-for="item in navigation"
                     :key="item.name"
-                    as="router-link"
                     :to="item.href"
-                    :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
+                    class="block rounded-md px-3 py-2 text-base font-medium text-gray-300"
+                    active-class="bg-gray-900 text-white"
                     :aria-current="item.current ? 'page' : undefined"
+                    @click="closeMenuAfterNavigation"
                 >
                     {{ item.name }}
-                </DisclosureButton>
+                </router-link>
             </div>
         </DisclosurePanel>
     </Disclosure>

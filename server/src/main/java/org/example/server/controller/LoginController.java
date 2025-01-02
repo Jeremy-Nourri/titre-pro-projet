@@ -5,13 +5,11 @@ import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
 import org.example.server.service.LoginService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("/api")
 public class LoginController {
 
     private final LoginService loginService;
@@ -20,9 +18,24 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<LoginDtoResponse> login(@Valid @RequestBody LoginDtoRequest loginDtoRequest) {
         LoginDtoResponse loginDtoResponse = loginService.login(loginDtoRequest);
         return ResponseEntity.ok(loginDtoResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            boolean result = loginService.logout(token);
+            if (result) {
+                SecurityContextHolder.clearContext();
+                return ResponseEntity.ok().body("Déconnexion réussie");
+            } else {
+                return ResponseEntity.status(403).body("Token invalide ou blacklisté");
+            }
+        }
+        return ResponseEntity.badRequest().body("Authorization header missing or invalid");
     }
 }

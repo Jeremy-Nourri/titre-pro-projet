@@ -34,6 +34,8 @@ public class TaskDtoRequest {
     @NotNull
     private LocalDate dueDate;
 
-    private List<TagDtoRequest> tags;
+    private String tag;
+
+    private String tagColor;
 
 }

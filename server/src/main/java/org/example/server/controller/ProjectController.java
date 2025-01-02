@@ -64,9 +64,4 @@ public class ProjectController {
         return ResponseEntity.ok(project);
     }
 
-    @GetMapping("/user/{userId}/projectslist")
-    public ResponseEntity<List<ProjectDtoResponse>> getProjectsByUser(@PathVariable Long userId) {
-        List<ProjectDtoResponse> projects = projectService.getProjectsByUserId(userId);
-        return ResponseEntity.ok(projects);
-    }
 }

@@ -61,7 +61,6 @@ const onSubmit = handleSubmit(async (values) => {
 
         await projectStore.addColumn(newColumn);
         showAddColumnForm.value = false;
-        
     } catch (error) {
         console.error('Erreur lors de la soumission du formulaire :', error);
 
@@ -72,7 +71,7 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
     <main class="bg-gray-100 min-h-screen md:p-7 p-2">
         <h1 class="text-center mb-8">
-            Projet : {{ projectStore.projectState?.name || 'Chargement...' }}
+            {{ projectStore.projectState?.name || 'Chargement...' }}
         </h1>
         <div v-if="canAddColumn" class="flex justify-end mx-auto mb-6">
             <button
@@ -95,7 +94,7 @@ const onSubmit = handleSubmit(async (values) => {
             <p>Chargement des colonnes...</p>
         </div>
 
-        <div v-else class="min-h-72 max-h-full overflow-auto bg-slate-200 lg:flex lg:flex-nowrap md:flex md:flex-wrap md:justify-center gap-4 mx-auto p-4">
+        <div v-else class="min-h-[500px] max-h-full overflow-auto bg-slate-400 lg:flex lg:flex-nowrap md:flex md:flex-wrap md:justify-center gap-4 mx-auto p-4">
             <BoardColumn
                 v-for="column in projectStore.projectState?.boardColumns || []"
                 :key="column.id"

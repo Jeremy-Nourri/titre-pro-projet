@@ -1,18 +1,23 @@
 package org.example.server.service.impl;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
 import org.example.server.exception.InvalidCredentialsException;
 import org.example.server.mapper.ProjectMapper;
 import org.example.server.mapper.UserProjectMapper;
+import org.example.server.model.TokenBlacklist;
 import org.example.server.model.User;
+import org.example.server.repository.TokenBlacklistRepository;
 import org.example.server.repository.UserRepository;
 import org.example.server.service.LoginService;
 import org.example.server.security.JwtTokenUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +27,7 @@ public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
 
     @Override
     public LoginDtoResponse login(LoginDtoRequest loginRequest) {
@@ -58,4 +64,18 @@ public class LoginServiceImpl implements LoginService {
 
         return response;
     }
+
+    @Override
+    public Boolean logout(String token) {
+        Claims claims = jwtTokenUtil.validateToken(token);
+        Date expiration = claims.getExpiration();
+
+        TokenBlacklist blacklist = new TokenBlacklist();
+        blacklist.setToken(token);
+        blacklist.setExpiryDate(expiration);
+
+        tokenBlacklistRepository.save(blacklist);
+        return true;
+    }
+
 }
