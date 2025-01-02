@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             String authorizationHeader = request.getHeader("Authorization");
-            log.info("Processing request to: {}", request.getRequestURI());
+            log.info("Traitement de la requête: {}", request.getRequestURI());
 
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 String token = authorizationHeader.substring(7);
@@ -64,31 +64,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     JwtAuthenticationToken authentication = new JwtAuthenticationToken(userDetails, true);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    log.warn("Invalid token");
+                    log.warn("Token non valide");
                     sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Invalid token");
                     return;
                 }
             } else {
-                log.warn("Authorization header is missing or does not start with Bearer");
+                log.warn("Authorization header est manquante ou ne commence pas par Bearer");
             }
 
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException ex) {
-            log.error("Token has expired", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
+            log.error("Token expiré", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token expiré");
         } catch (JwtException ex) {
-            log.error("Invalid token", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Invalid token");
+            log.error("Token non valide", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Token non valide");
         } catch (Exception ex) {
-            log.error("An unexpected error occurred", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while processing the request");
+            log.error("Erreur inattendue", ex);
+            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erreur inattendue");
         }
     }
 
     private void sendErrorResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
         response.setStatus(statusCode);
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"" + message + "\"}");
+        response.getWriter().write("{\"erreur\": \"" + message + "\"}");
     }
 }

@@ -1,13 +1,13 @@
-import type { TagResponse } from "./tag";
-
 export interface TaskRequest {
+  id?: number;
   title: string;
   dueDate: string;
   detail?: string;
   priority: Priority,
   taskStatus: Status,
-  columnBoardId?: number;
-  tags?: TagResponse[];
+  columnBoardId: number;
+  tag?: string;
+  tagColor?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -20,7 +20,8 @@ export interface TaskResponse {
   priority: Priority;
   taskStatus: Status;
   columnBoardId: number;
-  tags: TagResponse[];
+  tag: string;
+  tagColor: string;
   createdAt: string;
   updatedAt?: string;
 }

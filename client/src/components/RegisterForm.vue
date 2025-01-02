@@ -90,9 +90,9 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
                     <ListboxLabel class="block font-medium text-xs md:text-base">Poste</ListboxLabel>
                     <div class="relative">
 
-                        <ListboxButton class="grid w-full cursor-pointer grid-cols-1 rounded-md bg-white py-2 pl-3 pr-2 text-left text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor ">
+                        <ListboxButton class="grid w-full cursor-pointer grid-cols-1 rounded-md bg-white py-2 pl-3 pr-2 text-left text-gray-900 outline outline-1 -outline-offset-1 outline-gray-500 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-bluecolor ">
                             <span class="col-start-1 row-start-1 flex items-center gap-3 pr-6"> 
-                                <span class="block truncate md:md:text-sm/6 text-[12px]">{{ positions.find(p => p.value === position)?.label || 'Sélectionnez une position' }}</span>
+                                <span class="block truncate text-gray-400 md:md:text-sm/6 text-[12px]">{{ positions.find(p => p.value === position)?.label || 'Sélectionnez un poste' }}</span>
                             </span> 
                             <ChevronUpDownIcon class="col-start-1 row-start-1 size-4 self-center justify-self-end text-gray-500 sm:size-4" aria-hidden="true" />
                         </ListboxButton>

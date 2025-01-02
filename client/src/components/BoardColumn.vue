@@ -52,12 +52,16 @@ const toggleTaskModal = () => {
     showTaskModal.value = !showTaskModal.value;
 };
 
-const handleTaskAdded = async (newTask: TaskRequest) => {
+const onSubmitTask = async (task: TaskRequest) => {
     try {
-        await projectStore.addTask(props.columnId, newTask);
-        showTaskModal.value = false;
-    } catch (error) {
-        console.error('Erreur lors de l\'ajout de la tâche :', error);
+        if (task.id) {
+            await projectStore.updateTaskDetails(props.columnId, task.id, task);
+        } else {
+
+            await projectStore.addTask(task.columnBoardId, task);
+        }
+    } catch (err) {
+        console.error('Erreur :', err);
     }
 };
 
@@ -83,35 +87,36 @@ const confirmDelete = async () => {
         console.error('Erreur lors de la suppression de la colonne:', error);
     }
 };
+
 </script>
 
 
 <template>
-    <div class="bg-slate-400 md:w-[35%] mb-2 rounded-md md:p-4 p-2 relative">
-        <div v-if="!isEditing" class="flex justify-end gap-4 mt-1 mb-4 mr-1">
+    <div class="bg-slate-200 md:w-[35%] mb-2 rounded-md md:p-3 p-2 relative">
+        <div v-if="!isEditing" class="flex justify-end gap-4 mt-1 mb-1 mr-1">
             <button
-                class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
+                class="justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
            ease-in duration-300 px-0.5 py-0.5"
                 title="Modifier le titre"
                 @click="toggleEdit"
             >
-                <PencilSquareIcon class="size-5 text-white group-hover:text-bluecolor ease-in duration-300" />
+                <PencilSquareIcon class="size-4 text-white group-hover:text-bluecolor ease-in duration-300" />
             </button>
             <button
-                class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
+                class="justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
            ease-in duration-300 px-0.5 py-0.5"
                 title="Supprimer la colonne"
                 @click="showDeleteModal = true"
             >
-                <TrashIcon class="size-5 text-white group-hover:text-bluecolor ease-in duration-300" />
+                <TrashIcon class="size-4 text-white group-hover:text-bluecolor ease-in duration-300" />
             </button>
         </div>
   
         <div class="flex justify-between items-center">
             <div v-if="!isEditing">
-                <div class="text-lg md:text-xl font-bold text-white">
+                <h4 class="text-lg md:text-xl font-bold text-gray-900">
                     {{ title }}
-                </div>
+                </h4>
             </div>
             <div v-else class="w-full">
                 <input
@@ -131,11 +136,11 @@ const confirmDelete = async () => {
         </div>
   
         <div class="mt-4">
-            <label for="sort" class="p-text block text-white mb-2">Trier par :</label>
+            <label for="sort" class="p-text-small block text-gray-900 mb-1">Trier par :</label>
             <select
                 id="sort"
                 v-model="sortOption"
-                class="w-full rounded-md p-text bg-slate-200 px-4 py-2 text-gray-900"
+                class="w-full rounded-md p-text-small bg-white px-2 py-1 text-gray-900 hover:cursor-pointer"
             >
                 <option value="priority">Priorité</option>
                 <option value="alphabetical">Alphabétique</option>
@@ -150,8 +155,8 @@ const confirmDelete = async () => {
                 :task="task"
             />
         </div>
-        <div v-else class="text-white text-center mt-4">
-            Aucune tâche disponible.
+        <div v-else class="p-text text-gray-900 text-center mt-4">
+            Aucune tâche disponible
         </div>
   
         <button
@@ -165,7 +170,7 @@ const confirmDelete = async () => {
             <TaskForm
                 :column-id="columnId"
                 @close="toggleTaskModal"
-                @submit="handleTaskAdded"
+                @submit="onSubmitTask"
             />
         </ReusableModal>
   

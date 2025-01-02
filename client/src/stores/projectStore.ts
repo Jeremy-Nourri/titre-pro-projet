@@ -6,10 +6,8 @@ import type { ProjectResponse, ProjectRequest } from "@/types/interfaces/project
 import type { BoardColumnRequest } from "@/types/interfaces/boardColumn";
 import type { TaskRequest } from "@/types/interfaces/task";
 
-import {
-    getProjectById,
-    createProject,
-} from "@/services/projectService";
+import { getProjectById, createProject } from "@/services/projectService";
+// import { createTag, updateTag } from "@/services/tagService";
 import {
     createColumn,
     updateColumn,
@@ -120,15 +118,47 @@ export const useProjectStore = defineStore("project", () => {
         }
     };
 
-    const updateTaskDetails = async (columnId: number, taskId: number, updatedTask: Partial<TaskRequest>) => {
+    const updateTaskDetails = async (
+        oldColumnId: number,
+        taskId: number,
+        updatedTask: Partial<TaskRequest>
+    ): Promise<void> => {
         try {
             const projectId = getProjectId();
-            const response = await updateTask(projectId, columnId, taskId, updatedTask);
-            const column = projectState.value?.boardColumns.find((col) => col.id === columnId);
-            const task = column?.tasks.find((t) => t.id === taskId);
-            if (task) Object.assign(task, response);
+    
+            const newColumnId = updatedTask.columnBoardId ?? oldColumnId;
+    
+            const updatedTaskResponse = await updateTask(projectId, newColumnId, taskId, updatedTask);
+    
+            if (newColumnId !== oldColumnId) {
+
+                const oldColumn = projectState.value?.boardColumns.find(
+                    (col) => col.id === oldColumnId
+                );
+                const newColumn = projectState.value?.boardColumns.find(
+                    (col) => col.id === newColumnId
+                );
+    
+                if (oldColumn) {
+                    oldColumn.tasks = oldColumn.tasks.filter((t) => t.id !== taskId);
+                }
+    
+                if (newColumn) {
+                    newColumn.tasks.push(updatedTaskResponse);
+                }
+            } else {
+
+                const column = projectState.value?.boardColumns.find(
+                    (col) => col.id === oldColumnId
+                );
+                const task = column?.tasks.find((t) => t.id === taskId);
+                if (task) {
+                    Object.assign(task, updatedTaskResponse);
+                }
+            }
         } catch (err) {
             error.value = handleError(err);
+            console.error('Erreur dans updateTaskDetails:', err);
         }
     };
 

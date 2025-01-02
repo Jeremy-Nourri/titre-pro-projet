@@ -1,5 +1,7 @@
 package org.example.server.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<ErrorDetails> handleEmailExistsException(EmailExistsException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
@@ -18,18 +22,8 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("EmailExistsException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        ex.printStackTrace();
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -39,6 +33,29 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("InvalidCredentialsException: {}", ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TokenInvalidException.class)
+    public ResponseEntity<ErrorDetails> handleTokenInvalidException(TokenInvalidException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        logger.warn("TokenInvalidException: {}", ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorDetails> handleTokenExpiredException(TokenExpiredException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        logger.warn("TokenExpiredException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
     }
 
@@ -49,6 +66,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("ProjectNotFoundException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
@@ -59,6 +77,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("UnauthorizedProjectAccessException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
@@ -69,17 +88,8 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("InvalidProjectDateException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UserNotAuthenticatedException.class)
-    public ResponseEntity<ErrorDetails> handleUserNotAuthenticatedException(UserNotAuthenticatedException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(UserAlreadyAssignedException.class)
@@ -89,6 +99,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("UserAlreadyAssignedException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 
@@ -99,6 +110,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("UserNotFoundException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
@@ -109,16 +121,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(TagNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleTagNotFoundException(TagNotFoundException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
+        logger.warn("TaskNotFoundException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
@@ -132,18 +135,18 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        logger.warn("BoardColumnNotFoundException: {}", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidTagTaskAssociationException.class)
-    public ResponseEntity<ErrorDetails> handleInvalidTagTaskAssociationException(InvalidTagTaskAssociationException ex, WebRequest request) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(
                 LocalDateTime.now(),
                 ex.getMessage(),
                 request.getDescription(false)
         );
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        logger.error("An unexpected error occurred", ex);
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
 }

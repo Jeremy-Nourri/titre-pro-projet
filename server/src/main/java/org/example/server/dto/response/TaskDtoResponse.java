@@ -23,7 +23,8 @@ public class TaskDtoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate dueDate;
     private Long boardColumnId;
-    private List<TagDtoResponse> tags;
+    private String tag;
+    private String tagColor;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate createdDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
