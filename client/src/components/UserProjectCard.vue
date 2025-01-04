@@ -21,7 +21,7 @@ const redirectToProject = () => {
         class="bg-white shadow-md rounded p-4 hover:shadow-lg cursor-pointer transition"
         @click="redirectToProject"
     >
-        <h3 class="font-bold">{{ project.projectName }}</h3>
+        <h3 class="">{{ project.projectName }}</h3>
         
         <p class="p-text text-gray-600">
             <strong>Ajouté le :</strong> {{ project.userAddedAt }}

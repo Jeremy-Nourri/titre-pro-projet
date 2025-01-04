@@ -25,25 +25,25 @@ public class UserMapper {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        UserDtoResponse response = new UserDtoResponse();
-        response.setId(user.getId());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setPosition(String.valueOf(user.getPosition()));
-        response.setCreatedDate(user.getCreatedDate());
-        response.setUpdatedDate(user.getUpdatedDate());
+        UserDtoResponse dto = new UserDtoResponse();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setPosition(String.valueOf(user.getPosition()));
+        dto.setCreatedDate(user.getCreatedDate());
+        dto.setUpdatedDate(user.getUpdatedDate());
         if(user.getCreatedProjects() != null) {
-            response.setCreatedProjects(user.getCreatedProjects().stream()
+            dto.setCreatedProjects(user.getCreatedProjects().stream()
                     .map(ProjectMapper::ProjectToProjectDtoResponse)
                     .collect(Collectors.toList()));
         }
         if (user.getUserProjects() != null) {
-            response.setUserProjects(user.getUserProjects().stream()
+            dto.setUserProjects(user.getUserProjects().stream()
                     .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)
                     .collect(Collectors.toList()));
         }
-        return response;
+        return dto;
     }
 
     public static UserSimplifiedDtoResponse toSimplifiedDto(User user) {

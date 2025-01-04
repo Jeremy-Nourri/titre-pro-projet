@@ -35,9 +35,12 @@ public class AuthorizationAspect {
                 .orElseThrow(() -> new ProjectNotFoundException("Projet non trouvé avec ID : " + projectId));
 
         boolean isAuthorized = project.getUserProjects().stream()
-                .anyMatch(userProject -> userProject.getUser().getEmail().equals(currentUserEmail)
-                        && Arrays.asList(authorizedRoles).contains(userProject.getRole())
-                        && (!isNeedWriteAccess || userProject.getRole().equals(RoleEnum.ADMIN)));
+                .anyMatch(userProject -> {
+                    boolean isCurrentUser = userProject.getUser().getEmail().equals(currentUserEmail);
+                    boolean hasRequiredRole = Arrays.asList(authorizedRoles).contains(userProject.getRole());
+                    boolean hasWriteAccess = !isNeedWriteAccess || userProject.getRole().equals(RoleEnum.ADMIN);
+                    return isCurrentUser && hasRequiredRole && hasWriteAccess;
+                });
 
         if (!isAuthorized) {
             throw new UnauthorizedProjectAccessException(

@@ -3,7 +3,6 @@ package org.example.server.controller;
 import org.example.server.dto.request.TaskDtoRequest;
 import org.example.server.dto.response.TaskDtoResponse;
 import org.example.server.dto.response.TaskSimplifiedDtoResponse;
-import org.example.server.model.Task;
 import org.example.server.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

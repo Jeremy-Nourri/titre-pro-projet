@@ -52,29 +52,23 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-
     const { useAuthStore } = await import('@/stores/authStore');
     const authStore = useAuthStore();
 
+    await authStore.initializeAuth();
+
     console.log('Checking route:', to.name);
     console.log('Token exists:', authStore.token);
-  
-    router.beforeEach(async (to) => {
-        const { useAuthStore } = await import('@/stores/authStore');
-        const authStore = useAuthStore();
 
-        await authStore.initializeAuth();
-    
-        if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
-            return { path: '/', query: { redirect: to.fullPath } };
-        }
-    
-        if (to.query.redirect && authStore.isAuthenticated()) {
-            return { path: to.query.redirect as string };
-        }
-    
-        return true;
-    });
+    if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
+        return { path: '/', query: { redirect: to.fullPath } };
+    }
+
+    if (to.query.redirect && authStore.isAuthenticated()) {
+        return { path: to.query.redirect as string };
+    }
+
+    return true;
 });
 
 export default router

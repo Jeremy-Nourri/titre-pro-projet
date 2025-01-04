@@ -54,7 +54,7 @@ public class ProjectController {
     @PostMapping("/{projectId}/users/{userId}")
     public ResponseEntity<String> addUserToProject(@PathVariable Long projectId, @Valid @RequestBody RoleRequest request) {
         projectService.addUserToProject(projectId, request.getUserEmail(), request.getRole());
-        return ResponseEntity.ok("Utilisateur ajouté avec succès au projet.");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Utilisateur ajouté avec succès au projet");
     }
 
     @GetMapping("/{projectId}")

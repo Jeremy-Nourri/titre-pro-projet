@@ -14,20 +14,20 @@ public class TaskMapper {
             return null;
         }
 
-        TaskDtoResponse taskDto = new TaskDtoResponse();
-        taskDto.setId(task.getId());
-        taskDto.setTitle(task.getTitle());
-        taskDto.setDetail(task.getDetail());
-        taskDto.setPriority(task.getPriority().name());
-        taskDto.setTaskStatus(task.getTaskStatus().name());
-        taskDto.setDueDate(task.getDueDate());
-        taskDto.setBoardColumnId(task.getBoardColumn().getId());
-        taskDto.setTag(task.getTag());
-        taskDto.setTagColor(task.getTagColor());
-        taskDto.setCreatedDate(task.getCreatedDate());
-        taskDto.setUpdatedDate(task.getUpdatedDate());
+        TaskDtoResponse dto = new TaskDtoResponse();
+        dto.setId(task.getId());
+        dto.setTitle(task.getTitle());
+        dto.setDetail(task.getDetail());
+        dto.setPriority(task.getPriority().name());
+        dto.setTaskStatus(task.getTaskStatus().name());
+        dto.setDueDate(task.getDueDate());
+        dto.setBoardColumnId(task.getBoardColumn().getId());
+        dto.setTag(task.getTag());
+        dto.setTagColor(task.getTagColor());
+        dto.setCreatedDate(task.getCreatedDate());
+        dto.setUpdatedDate(task.getUpdatedDate());
 
-        return taskDto;
+        return dto;
     }
 
     public static List<TaskDtoResponse> toTaskDTOList(List<Task> tasks) {

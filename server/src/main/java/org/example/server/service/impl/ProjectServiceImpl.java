@@ -122,7 +122,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'email : " + userEmail));
 
         if (userProjectRepository.findByUserAndProject(user, project).isPresent()) {
-            throw new IllegalArgumentException("Cet utilisateur est déjà associé à ce projet.");
+            throw new UserAlreadyAssignedException("Cet utilisateur est déjà associé à ce projet.");
         }
 
         UserProject userProject = UserProject.builder()
@@ -132,7 +132,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .userAddAt(LocalDate.now())
                 .build();
 
-        userProjectRepository.save(userProject);
+            userProjectRepository.save(userProject);
     }
 
     @Override

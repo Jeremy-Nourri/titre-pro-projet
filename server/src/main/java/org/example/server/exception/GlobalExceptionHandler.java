@@ -59,6 +59,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(AuthorizationHeaderMissingException.class)
+    public ResponseEntity<ErrorDetails> handleAuthorizationHeaderMissingException(AuthorizationHeaderMissingException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        logger.warn("AuthorizationHeaderMissingException: {}", ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(ProjectNotFoundException.class)
     public ResponseEntity<ErrorDetails> handleProjectNotFoundException(ProjectNotFoundException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(

@@ -21,7 +21,7 @@ function redirectToProject() {
         class="bg-white shadow-md rounded-md p-4 hover:shadow-lg cursor-pointer transition"
         @click="redirectToProject"
     >
-        <h4 class="">{{ project.name }}</h4>
+        <h3 class="">{{ project.name }}</h3>
         <p class="p-text text-gray-600">
             <strong>Description :</strong> {{ project.description }}
         </p>

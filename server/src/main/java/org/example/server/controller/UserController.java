@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.server.dto.request.UserDtoRequest;
 import org.example.server.dto.response.UserDtoResponse;
 import org.example.server.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDtoResponse> createUser(@Valid @RequestBody UserDtoRequest userDtoRequest) {
-        return ResponseEntity.ok(userService.createUser(userDtoRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDtoRequest));
     }
 
     @GetMapping("/{id}")
