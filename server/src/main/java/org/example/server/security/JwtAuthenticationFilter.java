@@ -1,5 +1,9 @@
 package org.example.server.security;
 
+import jakarta.servlet.ServletException;
+import org.example.server.exception.AuthorizationHeaderMissingException;
+import org.example.server.exception.TokenExpiredException;
+import org.example.server.exception.TokenInvalidException;
 import org.example.server.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.server.model.User;
 import org.example.server.repository.UserRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -33,16 +38,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws IOException, ServletException {
 
         try {
+
+            String requestURI = request.getRequestURI();
+
             if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            if (requestURI.startsWith("/api/login") || requestURI.startsWith("/api/users/register")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             String authorizationHeader = request.getHeader("Authorization");
             log.info("Traitement de la requête: {}", request.getRequestURI());
+
 
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 String token = authorizationHeader.substring(7);
@@ -65,30 +83,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     log.warn("Token non valide");
-                    sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Invalid token");
-                    return;
+                    throw new TokenInvalidException("Token non valide");
                 }
             } else {
-                log.warn("Authorization header est manquante ou ne commence pas par Bearer");
+                log.warn("Authorization header est manquante ou mal formée : {}", request.getRequestURI());
+                throw new AuthorizationHeaderMissingException("Authorization header est manquante ou mal formée");
             }
 
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException ex) {
-            log.error("Token expiré", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token expiré");
-        } catch (JwtException ex) {
-            log.error("Token non valide", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Token non valide");
-        } catch (Exception ex) {
-            log.error("Erreur inattendue", ex);
-            sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erreur inattendue");
-        }
-    }
+            log.error("Token expiré : {}", ex.getMessage());
+            throw new TokenExpiredException("Token expiré");
 
-    private void sendErrorResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
-        response.setStatus(statusCode);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"erreur\": \"" + message + "\"}");
+        } catch (JwtException ex) {
+            log.error("Erreur JWT : {}", ex.getMessage());
+            throw new TokenInvalidException("Token non valide") ;
+
+        } catch (ServletException ex) {
+            log.error("Erreur au niveau du Servlet : {}", ex.getMessage());
+            throw ex;
+        }
     }
 }

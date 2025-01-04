@@ -9,11 +9,13 @@ public class UserProjectMapper {
             return null;
         }
 
-        UserProjectDtoResponse response = new UserProjectDtoResponse();
-        response.setId(userProject.getId());
-        response.setProjectId(userProject.getProject().getId());
-        response.setProjectName(userProject.getProject().getName());
-        response.setUserAddedAt(userProject.getUserAddAt());
-        return response;
+        UserProjectDtoResponse dto = new UserProjectDtoResponse();
+        dto.setId(userProject.getId());
+        dto.setProjectId(userProject.getProject().getId());
+        dto.setProjectName(userProject.getProject().getName());
+        dto.setUserAddedAt(userProject.getUserAddAt());
+        dto.setCreatedDate(userProject.getCreatedDate());
+        dto.setUpdatedDate(userProject.getUpdatedDate());
+        return dto;
     }
 }
