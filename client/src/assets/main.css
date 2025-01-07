@@ -58,6 +58,6 @@ h4 {
 }
 
 .button-secondary {
-    @apply button-base hover:bg-bluecolor outline outline-4 outline-blue-600 bg-slate-50 hover:outline-bluecolor hover:text-white text-bluecolor
+    @apply button-base hover:bg-bluecolor outline outline-4 outline-bluecolor bg-slate-50 hover:outline-bluecolor hover:text-white text-bluecolor
 }
 

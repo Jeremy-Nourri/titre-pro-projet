@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userFound = userRepository.findByEmail(userRequest.getEmail());
 
         if (userFound.isPresent()) {
-            throw new EmailExistsException();
+            throw new EmailExistsException("Email déjà utilisé");
         }
 
         User user = UserMapper.mapUserDtoRequestToUser(userRequest);

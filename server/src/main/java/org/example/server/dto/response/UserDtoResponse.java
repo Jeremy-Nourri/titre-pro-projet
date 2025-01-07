@@ -19,7 +19,7 @@ public class UserDtoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate updatedDate;
 
-    private List<ProjectDtoResponse> createdProjects;
+    private List<CreatedProjectsDtoResponse> createdProjects;
     private List<UserProjectDtoResponse> userProjects;
 
 }

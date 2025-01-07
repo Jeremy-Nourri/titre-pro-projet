@@ -1,7 +1,6 @@
 package org.example.server.service.impl;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
@@ -33,10 +32,10 @@ public class LoginServiceImpl implements LoginService {
     public LoginDtoResponse login(LoginDtoRequest loginRequest) {
 
         User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> new InvalidCredentialsException("Email ou mot de passe invalide"));
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException("Email ou mot de passe invalide");
         }
 
         LoginDtoResponse response = new LoginDtoResponse();

@@ -30,7 +30,7 @@ const router = createRouter({
             },
         },
         { 
-            path: '/project/:id', 
+            path: '/projet/:id', 
             name: 'ProjectBoardView', 
             component: ProjectBoardView,
             props: true,
@@ -39,7 +39,7 @@ const router = createRouter({
             },
         },
         { 
-            path: '/projects', 
+            path: '/projets', 
             name: 'ListProjectsView', 
             component: ListProjectsView,
             props: true,

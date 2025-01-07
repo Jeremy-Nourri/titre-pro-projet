@@ -95,16 +95,16 @@ const confirmDelete = async () => {
     <div class="bg-slate-200 md:w-[35%] mb-2 rounded-md md:p-3 p-2 relative">
         <div v-if="!isEditing" class="flex justify-end gap-4 mt-1 mb-1 mr-1">
             <button
-                class="justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
-           ease-in duration-300 px-0.5 py-0.5"
+                class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor
+                 bg-bluecolor hover:bg-white ease-in duration-300 px-0.5 py-0.5"
                 title="Modifier le titre"
                 @click="toggleEdit"
             >
                 <PencilSquareIcon class="size-4 text-white group-hover:text-bluecolor ease-in duration-300" />
             </button>
             <button
-                class="justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
-           ease-in duration-300 px-0.5 py-0.5"
+                class="group justify-center rounded-sm hover:text-bluecolor outline outline-4 outline-bluecolor 
+                bg-bluecolor hover:bg-white ease-in duration-300 px-0.5 py-0.5"
                 title="Supprimer la colonne"
                 @click="showDeleteModal = true"
             >

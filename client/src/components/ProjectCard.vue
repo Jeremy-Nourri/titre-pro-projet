@@ -26,7 +26,7 @@ function redirectToProject() {
             <strong>Description :</strong> {{ project.description }}
         </p>
         <p class="p-text text-gray-600">
-            <strong>Date de début :</strong> {{ project.startDate }}
+            <strong>Date de fin :</strong> {{ project.endDate }}
         </p>
     </div>
 </template>
