@@ -123,8 +123,7 @@ const onSubmit = handleSubmit(async (values: UserForm) => {
                 <FormInput v-model="confirmPassword" type="password" label="Confirmation du mot de passe" placeholder="Entrez votre mot de passe" autocomplete="off" :error="errors.confirmPassword" />
 
                 <p v-if="authStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
-                    {{ authStore.error === '409' ? "Email déjà utilisé" : "Une erreur est survenue, veuillez réessayer ultérieurement" }}
-                </p>
+                    {{ authStore.error.message }}                </p>
 
                 <div class="my-6 ">
                     <button type="submit" class="button-primary">

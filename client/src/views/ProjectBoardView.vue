@@ -7,14 +7,22 @@ import { useRoute } from 'vue-router';
 import FormInput from '@/components/ui/FormInput.vue';
 import BoardColumn from '@/components/BoardColumn.vue';
 import ReusableModal from '@/components/ui/ReusableModal.vue';
+import AddUserInProjectForm from '@/components/AddUserInProjectForm.vue';
 import { PlusCircleIcon } from '@heroicons/vue/20/solid'
 import type { BoardColumnRequest } from '@/types/interfaces/boardColumn';
+import type { UserProjectRequest } from '@/types/interfaces/userProject';
 
 const projectStore = useProjectStore();
 
 const route = useRoute();
 
 const showAddColumnForm = ref(false);
+const showAddUserForm = ref(false);
+const messageResponse = ref<string | null>()
+
+const toggleShowAddUserForm = () => {
+    showAddUserForm.value =!showAddUserForm.value;
+}
 
 const schema = yup.object({
     name: yup
@@ -43,13 +51,14 @@ onMounted(async () => {
         const paramId = Number(route.params.id);
 
         await projectStore.fetchProjectById(paramId);
+        messageResponse.value = null;
     }
     catch (err) {
         console.error('Erreur lors de la récupération du projet :', err);
     }
 });
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmitNewColumn = handleSubmit(async (values) => {
     try {
         const paramId = Number(route.params.id);
 
@@ -66,6 +75,21 @@ const onSubmit = handleSubmit(async (values) => {
 
     }
 });
+
+const handleSubmitAddUser = async (userProject: UserProjectRequest) => {
+    try {
+        const response = await projectStore.addUserToProject(userProject);
+        messageResponse.value = response;
+        if (response) {
+            showAddUserForm.value = false;
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de l'ajout de l'utilisateur :", error);
+    }
+};
+
+
 </script>
 
 <template>
@@ -74,6 +98,15 @@ const onSubmit = handleSubmit(async (values) => {
             {{ projectStore.projectState?.name || 'Chargement...' }}
         </h1>
         <div v-if="canAddColumn" class="flex justify-end mx-auto mb-6">
+            <button 
+                class="button-secondary" 
+                type="button" 
+                title="Ajouter un utilisateur"
+                @click="toggleShowAddUserForm"
+            >
+                Ajouter un utilisateur
+            </button>
+            
             <button
                 class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
                  ease-in duration-300 lg:p-1.5 p-0.5"
@@ -109,7 +142,7 @@ const onSubmit = handleSubmit(async (values) => {
                 <template #default>
                     <div class="p-4">
                         <h2 class="text-lg font-bold mb-4">Ajouter une colonne</h2>
-                        <form @submit.prevent="onSubmit">
+                        <form @submit.prevent="onSubmitNewColumn">
                             <FormInput
                                 v-model="name"
                                 label="Nom de la colonne"
@@ -124,5 +157,13 @@ const onSubmit = handleSubmit(async (values) => {
                 </template>
             </ReusableModal>
         </div>
+        <ReusableModal v-if="projectStore.projectState?.id" v-model="showAddUserForm" >
+            <AddUserInProjectForm
+                :project-id="projectStore.projectState?.id"
+                :errors-response="projectStore.error"
+                @close="toggleShowAddUserForm"
+                @submit="handleSubmitAddUser"
+            />
+        </ReusableModal>
     </main>
 </template>

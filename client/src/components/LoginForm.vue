@@ -73,7 +73,7 @@ const onSubmit = handleSubmit(async (values: LoginRequest) => {
                 />
 
                 <p v-if="authStore.error" class="my-4 py-2 bg-danger text-center text-white md:text-xs/6 text-[10px]">
-                    {{ authStore.error }}
+                    {{ authStore.error.message }}
                 </p>
             
                 <div class="my-4 ">

@@ -7,5 +7,4 @@ import java.util.Date;
 
 public interface TokenBlacklistRepository extends JpaRepository<TokenBlacklist, String> {
     boolean existsByToken(String token);
-    void deleteAllByExpiryDateBefore(Date date);
 }

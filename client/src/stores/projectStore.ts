@@ -2,39 +2,27 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+import { handleError } from "@/utils/handleError";
+import { getProjectById, createProject, addUserInProject } from "@/services/projectService";
+import { createColumn, updateColumn, deleteColumn } from "@/services/boardColumnService";
+import { createTask, updateTask, deleteTask } from "@/services/taskService";
+
 import type { ProjectResponse, ProjectRequest } from "@/types/interfaces/project";
 import type { BoardColumnRequest } from "@/types/interfaces/boardColumn";
 import type { TaskRequest } from "@/types/interfaces/task";
-
-import { getProjectById, createProject } from "@/services/projectService";
-// import { createTag, updateTag } from "@/services/tagService";
-import {
-    createColumn,
-    updateColumn,
-    deleteColumn,
-} from "@/services/boardColumnService";
-import {
-    createTask,
-    updateTask,
-    deleteTask,
-} from "@/services/taskService";
+import type { UserProjectRequest } from "@/types/interfaces/userProject";
+import type { ResponseError } from "@/types/responseError";
 
 export const useProjectStore = defineStore("project", () => {
     const router = useRouter();
 
     const projectState = ref<ProjectResponse | null>(null);
     const isLoading = ref(false);
-    const error = ref<string | null>(null);
+
+    const error = ref<ResponseError | null>(null);
 
     const resetError = () => {
         error.value = null;
-    };
-
-    const handleError = (err: unknown): string => {
-        if (err instanceof Error) {
-            return err.message;
-        }
-        return "Une erreur inattendue s'est produite.";
     };
 
     const getProjectId = (): number => {
@@ -55,8 +43,8 @@ export const useProjectStore = defineStore("project", () => {
                 params: { id: projectState.value?.id },
             });
             return response;
-        } catch (err) {
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -77,16 +65,23 @@ export const useProjectStore = defineStore("project", () => {
     };
 
     const addColumn = async (column: BoardColumnRequest) => {
+        isLoading.value = true;
+        resetError();
         try {
             const response = await createColumn(column.projectId, column);
             projectState.value?.boardColumns.push(response);
             await fetchProjectById(column.projectId);
         } catch (err) {
             error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
+    
         }
     };
 
     const updateColumnName = async (columnId: number, name: string) => {
+        isLoading.value = true;
+        resetError();
         try {
             const projectId = getProjectId();
             await updateColumn(projectId, columnId, { name });
@@ -94,20 +89,28 @@ export const useProjectStore = defineStore("project", () => {
             if (column) column.name = name;
         } catch (err) {
             error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
     };
 
     const removeColumn = async (columnId: number) => {
+        isLoading.value = true;
+        resetError();
         try {
             const projectId = getProjectId();
             const response = await deleteColumn(projectId, columnId);
             projectState.value = response;
         } catch (err) {
             error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
     };
 
     const addTask = async (columnId: number, task: TaskRequest) => {
+        isLoading.value = true;
+        resetError();
         try {
             const projectId = getProjectId();
             const response = await createTask(projectId, columnId, task);
@@ -115,14 +118,14 @@ export const useProjectStore = defineStore("project", () => {
             if (column) column.tasks.push(response);
         } catch (err) {
             error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
     };
 
-    const updateTaskDetails = async (
-        oldColumnId: number,
-        taskId: number,
-        updatedTask: Partial<TaskRequest>
-    ): Promise<void> => {
+    const updateTaskDetails = async (oldColumnId: number, taskId: number, updatedTask: Partial<TaskRequest>) => {
+        isLoading.value = true;
+        resetError();
         try {
             const projectId = getProjectId();
     
@@ -159,10 +162,14 @@ export const useProjectStore = defineStore("project", () => {
         } catch (err) {
             error.value = handleError(err);
             console.error('Erreur dans updateTaskDetails:', err);
+        } finally {
+            isLoading.value = false;
         }
     };
 
     const removeTask = async (columnId: number, taskId: number) => {
+        isLoading.value = true;
+        resetError();
         try {
             const projectId = getProjectId();
             await deleteTask(projectId, columnId, taskId);
@@ -170,6 +177,21 @@ export const useProjectStore = defineStore("project", () => {
             if (column) column.tasks = column.tasks.filter((task) => task.id !== taskId);
         } catch (err) {
             error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const addUserToProject = async (dataAddUser: UserProjectRequest) => {
+        isLoading.value = true;
+        resetError();
+        try {
+            return await addUserInProject(dataAddUser)
+            
+        } catch (err) {
+            error.value = handleError(err);
+        } finally {
+            isLoading.value = false;
         }
     };
 
@@ -185,5 +207,6 @@ export const useProjectStore = defineStore("project", () => {
         addTask,
         updateTaskDetails,
         removeTask,
+        addUserToProject
     };
 });

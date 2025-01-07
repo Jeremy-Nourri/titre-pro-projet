@@ -11,7 +11,7 @@ const authStore = useAuthStore();
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', current: true },
     { name: 'Créer un projet', href: '/nouveau-projet', current: false },
-    { name: 'Mes projets', href: '/projects', current: false },
+    { name: 'Mes projets', href: '/projets', current: false },
 ];
 
 const isOpenMenuMobile = ref<boolean>(false);
@@ -23,7 +23,6 @@ const handleMenuToggle = () => {
 const closeMenuAfterNavigation = () => {
     isOpenMenuMobile.value = false;
 };
-
 
 const handleSignout = () => {
     authStore.signout();

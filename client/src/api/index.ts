@@ -1,5 +1,4 @@
 import axios from "axios";
-import { handleApiError } from "./handleApiError";
 
 export const api = axios.create({
     baseURL: "http://localhost:8080/api",
@@ -19,10 +18,17 @@ api.interceptors.request.use(
     }
 );
 
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        const handledError = handleApiError(error);
-        return Promise.reject(handledError);
+        if (error.response) {
+            const status = error.response.status;
+            const serverMessage = error.response.data?.message;
+            return Promise.reject({ status, message: serverMessage });
+        }
+        return Promise.reject(error);
     }
 );
+          
+        

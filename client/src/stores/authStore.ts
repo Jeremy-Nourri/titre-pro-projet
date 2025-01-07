@@ -1,17 +1,22 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { jwtDecode } from "jwt-decode";
-import type { LoginRequest, LoginResponse } from "@/types/interfaces/login";
+import { useRouter } from "vue-router";
+
 import { login, logout } from "@/services/authService";
 import { createUser, getUserDetails } from "@/services/userService";
-import { useRouter } from "vue-router";
+import { handleError } from "@/utils/handleError";
+
 import type { UserRequest } from "@/types/interfaces/user";
+import type { LoginRequest, LoginResponse } from "@/types/interfaces/login";
+import type { ResponseError } from "@/types/responseError";
 
 export const useAuthStore = defineStore("authStore", () => {
     const token = ref<string | null>(localStorage.getItem("token"));
     const user = ref<Partial<LoginResponse | null>>(null);
     const isLoading = ref(false);
-    const error = ref<string | null>(null);
+
+    const error = ref<ResponseError| null>(null);
     const router = useRouter();
 
     const resetError = () => {
@@ -44,13 +49,6 @@ export const useAuthStore = defineStore("authStore", () => {
         return decoded !== null && !isTokenExpired(decoded.exp);
     };
 
-    const handleError = (err: unknown): string => {
-        if (err instanceof Error) {
-            return err.message;
-        }
-        return "Une erreur inattendue s'est produite.";
-    };
-
     const signin = async (credentials: LoginRequest) => {
         isLoading.value = true;
         resetError();
@@ -65,9 +63,8 @@ export const useAuthStore = defineStore("authStore", () => {
             } else {
                 await router.push({ name: "DashboardView" });
             }
-        } catch (err) {
-            console.error("Erreur lors de la connexion :", err);
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -81,9 +78,8 @@ export const useAuthStore = defineStore("authStore", () => {
             localStorage.removeItem("token");
             await router.push({ name: "HomeView" });
 
-        } catch (err) {
-            console.error("Erreur lors de la déconnexion:", err);
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -101,9 +97,8 @@ export const useAuthStore = defineStore("authStore", () => {
             } else {
                 throw new Error("Impossible de décoder le token.");
             }
-        } catch (err) {
-            console.error("Erreur lors de la récupération des informations de l'utilisateur :", err);
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -114,8 +109,8 @@ export const useAuthStore = defineStore("authStore", () => {
         resetError();
         try {
             await createUser(userRequest);
-        } catch (err) {
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -129,8 +124,8 @@ export const useAuthStore = defineStore("authStore", () => {
             if (response) {
                 user.value = response;
             }
-        } catch (err) {
-            error.value = handleError(err);
+        } catch (err: unknown) {
+            error.value =  handleError(err);
         } finally {
             isLoading.value = false;
         }
@@ -149,7 +144,7 @@ export const useAuthStore = defineStore("authStore", () => {
             } else {
                 await signout();
             }
-        }
+        } 
     };
 
     return {
