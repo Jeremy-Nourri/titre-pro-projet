@@ -22,6 +22,13 @@ const redirectToProject = () => {
         @click="redirectToProject"
     >
         <h3 class="">{{ project.projectName }}</h3>
+
+        <p class="p-text text-gray-600">
+            <strong>Description :</strong> {{ project.projectDescription }}
+        </p>
+        <p class="p-text text-gray-600">
+            <strong>Date de fin :</strong> {{ project.endDate }}
+        </p>
         
         <p class="p-text text-gray-600">
             <strong>Ajouté le :</strong> {{ project.userAddedAt }}

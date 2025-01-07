@@ -6,11 +6,17 @@ export const createTask = async (
     columnId: number,
     task: TaskRequest
 ): Promise<TaskResponse> => {
-    const response = await api.post<TaskResponse>(
-        `/projects/${projectId}/columns/${columnId}/tasks`,
-        task
-    );
-    return response.data;
+    
+    try {
+        const response = await api.post<TaskResponse>(
+            `/projects/${projectId}/columns/${columnId}/tasks`,
+            task
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
 export const updateTask = async (
@@ -19,11 +25,16 @@ export const updateTask = async (
     taskId: number,
     updatedTask: Partial<TaskRequest>
 ): Promise<TaskResponse> => {
-    const response = await api.put<TaskResponse>(
-        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`,
-        updatedTask
-    );
-    return response.data;
+    try {
+        const response = await api.put<TaskResponse>(
+            `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`,
+            updatedTask
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
 export const deleteTask = async (
@@ -31,7 +42,12 @@ export const deleteTask = async (
     columnId: number,
     taskId: number
 ): Promise<void> => {
-    await api.delete<void>(`/projects/${projectId}/columns/${columnId}/tasks/${taskId}`);
+    try {
+        await api.delete<void>(`/projects/${projectId}/columns/${columnId}/tasks/${taskId}`);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
 export const getTaskById = async (
@@ -39,8 +55,14 @@ export const getTaskById = async (
     columnId: number,
     taskId: number
 ): Promise<TaskResponse> => {
-    const response = await api.get<TaskResponse>(
-        `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`
-    );
-    return response.data;
+    try {
+        const response = await api.get<TaskResponse>(
+            `/projects/${projectId}/columns/${columnId}/tasks/${taskId}`
+        );
+        return response.data;
+    
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };

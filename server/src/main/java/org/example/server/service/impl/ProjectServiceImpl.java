@@ -155,7 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = true)
+    @CheckProjectAuthorization(roles = {RoleEnum.ADMIN, RoleEnum.MEMBER}, isNeedWriteAccess = false)
     @Transactional(readOnly = true)
     public ProjectDtoResponse getProjectById(Long projectId) {
         Project projectFound =  projectRepository.findByIdWithColumns(projectId)

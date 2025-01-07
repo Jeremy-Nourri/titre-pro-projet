@@ -29,7 +29,6 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
     private final BoardColumnRepository boardColumnRepository;
     private final ProjectRepository projectRepository;
-    private final TaskRepository taskRepository;
 
     @Override
     @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
