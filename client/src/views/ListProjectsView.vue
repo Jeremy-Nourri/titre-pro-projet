@@ -25,7 +25,7 @@ const userProjects = computed(() => authStore.user?.userProjects ?? []);
 <template>
     <main class="bg-slate-50 h-screen p-4">
         <h4 class="mb-4 text-bluecolor">Mes projets créés</h4>
-        <div v-if="createdProjects.length > 0" class="flex">
+        <div v-if="createdProjects.length > 0" class="flex gap-3">
             <ProjectCard
                 v-for="project in createdProjects"
                 :key="project.id"
@@ -35,7 +35,7 @@ const userProjects = computed(() => authStore.user?.userProjects ?? []);
         <div v-else>Aucun projet créé.</div>
 
         <h4 class="mb-4 mt-8 text-bluecolor">Mes projets</h4>
-        <div v-if="userProjects.length > 0" class="flex">
+        <div v-if="userProjects.length > 0" class="flex gap-3">
             <UserProjectCard
                 v-for="project in userProjects"
                 :key="project.id"

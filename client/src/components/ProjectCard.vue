@@ -21,12 +21,12 @@ function redirectToProject() {
         class="bg-white shadow-md rounded-md p-4 hover:shadow-lg cursor-pointer transition"
         @click="redirectToProject"
     >
-        <h3 class="">{{ project.name }}</h3>
-        <p class="p-text text-gray-600">
-            <strong>Description :</strong> {{ project.description }}
+        <h4 class="">{{ project.name }}</h4>
+        <p class="p-text-small text-gray-600">
+            Description : {{ project.description }}
         </p>
-        <p class="p-text text-gray-600">
-            <strong>Date de fin :</strong> {{ project.endDate }}
+        <p class="p-text-small text-gray-600">
+            Date de fin : {{ project.endDate }}
         </p>
     </div>
 </template>

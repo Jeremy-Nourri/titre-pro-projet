@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onBeforeUnmount } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import FormInput from '@/components/ui/FormInput.vue';
@@ -13,6 +14,9 @@ import {
 import { ChevronUpDownIcon } from '@heroicons/vue/16/solid';
 import { CheckIcon } from '@heroicons/vue/20/solid';
 import type { ResponseError } from '@/types/responseError';
+import { useProjectStore } from '@/stores/projectStore';
+
+const projectStore = useProjectStore();
 
 const props = defineProps<{
   projectId: number;
@@ -26,10 +30,18 @@ const roles = [
     { value: 'MEMBER', label: "Participant"}
 ]
 
+onBeforeUnmount(() => {
+    projectStore.resetError();
+});
+
+setInterval(() => {
+    projectStore.resetError();
+}, 30000);
+
 
 const schema = yup.object({
     userEmail: yup.string().email('Email invalide').required('L\'email est requis'),
-    role: yup.string().required('La position est requise'),
+    role: yup.string().required('Le rôle est requis'),
 });
 
 const { handleSubmit, errors } = useForm<UserProjectRequest>({
@@ -69,9 +81,9 @@ const onSubmit = handleSubmit((values) => {
         </button>
 
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2 class="text-center tracking-tight text-primary">
+            <h3 class="text-center tracking-tight text-primary">
                 Ajouter un utilisateur au projet
-            </h2>
+            </h3>
         </div>
 
         <div class="my-6 sm:mx-auto sm:w-full sm:max-w-sm h-full px-8">

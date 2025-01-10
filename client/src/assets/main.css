@@ -34,7 +34,7 @@ h3 {
 }
 
 h4 {
-    @apply text-base sm:text-base md:text-lg lg:text-lg xl:text-2xl font-bold first-letter:uppercase;
+    @apply text-sm sm:text-sm md:text-base lg:text-base xl:text-lg font-bold first-letter:uppercase;
 }
 
 .p-text {
@@ -42,7 +42,7 @@ h4 {
 }
 
 .p-text-small {
-    @apply text-[0.5rem] sm:text-xs md:text-sm lg:text-base xl:text-base
+    @apply text-[0.5rem] sm:text-[0.5rem] md:text-xs lg:text-xs xl:text-base
 }
 
 .form-input {

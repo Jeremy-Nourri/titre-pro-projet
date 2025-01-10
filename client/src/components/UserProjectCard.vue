@@ -21,17 +21,17 @@ const redirectToProject = () => {
         class="bg-white shadow-md rounded p-4 hover:shadow-lg cursor-pointer transition"
         @click="redirectToProject"
     >
-        <h3 class="">{{ project.projectName }}</h3>
+        <h4 class="">{{ project.projectName }}</h4>
 
-        <p class="p-text text-gray-600">
-            <strong>Description :</strong> {{ project.projectDescription }}
+        <p class="p-text-small mb-1 text-gray-600">
+            Description : {{ project.projectDescription }}
         </p>
-        <p class="p-text text-gray-600">
-            <strong>Date de fin :</strong> {{ project.endDate }}
+        <p class="p-text-small mb-1 text-gray-600">
+            Date de fin : {{ project.endDate }}
         </p>
         
-        <p class="p-text text-gray-600">
-            <strong>Ajouté le :</strong> {{ project.userAddedAt }}
+        <p class="p-text-small mb-1 text-gray-600">
+            Ajouté le : {{ project.userAddedAt }}
         </p>
     </div>
 </template>

@@ -207,6 +207,7 @@ export const useProjectStore = defineStore("project", () => {
         addTask,
         updateTaskDetails,
         removeTask,
-        addUserToProject
+        addUserToProject,
+        resetError
     };
 });

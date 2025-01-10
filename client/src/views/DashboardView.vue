@@ -9,7 +9,7 @@ const userFirstName = authStore.user?.firstName
 
 <template>
     <main class=" h-screen flex flex-col items-center  bg-slate-50">
-        <p class="p-text mt-10">Bienvenue {{ userFirstName }} sur votre Dashboard Project Flow</p>
+        <p class="p-text mt-10">Bienvenue <span class="text-bluecolor font-bold">{{ userFirstName }}</span> sur votre Dashboard Project Flow</p>
         <p class="p-text">Retrouvez vos projets, la liste des membres associés à vos projets..</p>
 
     </main>

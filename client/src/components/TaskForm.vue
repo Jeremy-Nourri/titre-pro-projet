@@ -142,9 +142,9 @@ const onSubmit = handleSubmit(async (values) => {
         </button>
 
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2 class="text-center tracking-tight text-primary">
+            <h3 class="text-center tracking-tight text-primary">
                 {{ props.task?.id ? 'Modifier une tâche' : 'Créer une tâche' }}
-            </h2>
+            </h3>
         </div>
 
         <div class="my-6 sm:mx-auto sm:w-full sm:max-w-sm h-full px-8">

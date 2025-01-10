@@ -49,7 +49,7 @@ public class LoginServiceImpl implements LoginService {
 
         if (user.getCreatedProjects() != null) {
             response.setCreatedProjects(user.getCreatedProjects().stream()
-                    .map(ProjectMapper::ProjectToProjectDtoResponse)
+                    .map(ProjectMapper::ProjectToCreatedProjectsDtoResponse)
                     .collect(Collectors.toList()));
         }
 
