@@ -60,10 +60,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(readOnly = true)
     public List<ProjectDtoResponse> getProjectsByUserId(Long userId) {
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur avec ID " + userId + " non trouvé"));
+       List<Project> projects = projectRepository.findAllByUserId(userId);
 
-        List<Project> projects = projectRepository.findAllByUserId(userId);
+        if (projects.isEmpty()) {
+            throw new UserNotFoundException("Aucun projet trouvé pour l'utilisateur avec ID " + userId);
+        }
 
         return projects.stream().map(ProjectMapper::ProjectToProjectDtoResponse).toList();
     }

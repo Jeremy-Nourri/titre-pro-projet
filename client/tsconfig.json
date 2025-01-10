@@ -11,14 +11,20 @@
       "path": "./tsconfig.vitest.json"
     }
   ],
-	"compilerOptions": {
-		"types": ["vitest"],
-		"strict": true,
-		"esModuleInterop": true,
-		"moduleResolution": "node",
-		"baseUrl": ".",
+  "compilerOptions": {
+    "types": ["vitest/globals"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
-	}
+  }
 }
+

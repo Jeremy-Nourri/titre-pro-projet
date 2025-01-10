@@ -12,11 +12,11 @@ import type { LoginRequest, LoginResponse } from "@/types/interfaces/login";
 import type { ResponseError } from "@/types/responseError";
 
 export const useAuthStore = defineStore("authStore", () => {
-    const token = ref<string | null>(localStorage.getItem("token"));
+    const token = ref<string | null>(null);
     const user = ref<Partial<LoginResponse | null>>(null);
     const isLoading = ref(false);
-
     const error = ref<ResponseError| null>(null);
+
     const router = useRouter();
 
     const resetError = () => {
@@ -56,13 +56,9 @@ export const useAuthStore = defineStore("authStore", () => {
             const response = await login(credentials);
             updateAuthData(response);
 
-            const redirectPath = router.currentRoute.value.query.redirect as string;
 
-            if (redirectPath) {
-                await router.push(redirectPath);
-            } else {
-                await router.push({ name: "DashboardView" });
-            }
+            await router.push({ name: "DashboardView" });
+
         } catch (err: unknown) {
             error.value =  handleError(err);
         } finally {
@@ -138,11 +134,12 @@ export const useAuthStore = defineStore("authStore", () => {
             const decoded = decodeToken(storedToken);
             if (decoded && !isTokenExpired(decoded.exp)) {
                 token.value = storedToken;
-                if (!user.value) {
-                    await fetchUser();
-                }
+                await fetchUser();
+            
             } else {
-                await signout();
+                user.value = null;
+                localStorage.removeItem('token');
+                token.value = null;
             }
         } 
     };
@@ -152,6 +149,7 @@ export const useAuthStore = defineStore("authStore", () => {
         user,
         isLoading,
         error,
+        decodeToken,
         signin,
         signout,
         initializeAuth,

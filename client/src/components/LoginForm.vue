@@ -57,7 +57,7 @@ const onSubmit = handleSubmit(async (values: LoginRequest) => {
     <div class="bg-white md:w-3/5 w-11/12 mx-auto rounded-2xl shadow-2xl pb-4">
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <img class="mx-auto h-32 w-auto" :src="LogoProjectFlow" alt="Your Company" />
-            <h2 class="text-center tracking-tight text-primary">Se connecter</h2>
+            <h3 class="text-center tracking-tight text-primary">Se connecter</h3>
         </div>
         <div class="my-6 sm:mx-auto sm:w-full sm:max-w-sm h-full px-8">
             <form @submit.prevent="onSubmit">

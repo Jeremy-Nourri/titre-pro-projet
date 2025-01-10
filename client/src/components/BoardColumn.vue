@@ -114,7 +114,7 @@ const confirmDelete = async () => {
   
         <div class="flex justify-between items-center">
             <div v-if="!isEditing">
-                <h4 class="text-lg md:text-xl font-bold text-gray-900">
+                <h4 class="text-gray-900">
                     {{ title }}
                 </h4>
             </div>

@@ -97,7 +97,7 @@ const handleSubmitAddUser = async (userProject: UserProjectRequest) => {
         <h1 class="text-center mb-8">
             {{ projectStore.projectState?.name || 'Chargement...' }}
         </h1>
-        <div v-if="canAddColumn" class="flex justify-end mx-auto mb-6">
+        <div v-if="canAddColumn" class="flex justify-between mx-auto mb-6">
             <button 
                 class="button-secondary" 
                 type="button" 
@@ -108,8 +108,8 @@ const handleSubmitAddUser = async (userProject: UserProjectRequest) => {
             </button>
             
             <button
-                class="group justify-center rounded-sm hover:white outline outline-4 outline-bluecolor bg-bluecolor hover:bg-white
-                 ease-in duration-300 lg:p-1.5 p-0.5"
+                class="group justify-center rounded-sm hover:white outline outline-2 outline-bluecolor bg-bluecolor hover:bg-white
+                 ease-in duration-300 lg:px-3.5 p-0.5"
                 title="Ajouter une colonne"
                 @click="showAddColumnForm = true"
                 
@@ -141,7 +141,7 @@ const handleSubmitAddUser = async (userProject: UserProjectRequest) => {
             <ReusableModal v-model="showAddColumnForm">
                 <template #default>
                     <div class="p-4">
-                        <h2 class="text-lg font-bold mb-4">Ajouter une colonne</h2>
+                        <h3 class="text-lg font-bold mb-4">Ajouter une colonne</h3>
                         <form @submit.prevent="onSubmitNewColumn">
                             <FormInput
                                 v-model="name"

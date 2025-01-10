@@ -36,6 +36,6 @@ public class LoginController {
                 return ResponseEntity.status(403).body("Token invalide ou blacklisté");
             }
         }
-        return ResponseEntity.badRequest().body("Authorization header missing or invalid");
+        return ResponseEntity.badRequest().body("Authorization header manquante ou invalide");
     }
 }
