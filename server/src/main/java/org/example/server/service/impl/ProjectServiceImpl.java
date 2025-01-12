@@ -28,6 +28,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
+    private final ProjectMapper projectMapper;
+
 
     @Override
     @Transactional
@@ -50,9 +52,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project savedProject = projectRepository.save(project);
 
-        assignRoleToUserInProject(project.getId(), currentUser.getUsername(), RoleEnum.ADMIN);
+        assignRoleToUserInProject(savedProject.getId(), currentUser.getUsername(), RoleEnum.ADMIN);
 
-        return ProjectMapper.ProjectToProjectDtoResponse(savedProject);
+        return projectMapper.projectToProjectDtoResponse(savedProject);
     }
 
     @Override
@@ -66,7 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new UserNotFoundException("Aucun projet trouvé pour l'utilisateur avec ID " + userId);
         }
 
-        return projects.stream().map(ProjectMapper::ProjectToProjectDtoResponse).toList();
+        return projects.stream().map(projectMapper::projectToProjectDtoResponse).toList();
     }
 
     @Override
@@ -98,7 +100,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project updatedProject = projectRepository.save(existingProject);
 
-        return ProjectMapper.ProjectToProjectDtoResponse(updatedProject);
+        return projectMapper.projectToProjectDtoResponse(updatedProject);
     }
 
     @Override
@@ -161,6 +163,6 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectDtoResponse getProjectById(Long projectId) {
         Project projectFound =  projectRepository.findByIdWithColumns(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
-        return ProjectMapper.ProjectToProjectDtoResponse(projectFound);
+        return projectMapper.projectToProjectDtoResponse(projectFound);
     }
 }

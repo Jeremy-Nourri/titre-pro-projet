@@ -6,6 +6,7 @@ import org.example.server.dto.request.LoginDtoRequest;
 import org.example.server.dto.response.LoginDtoResponse;
 import org.example.server.exception.InvalidCredentialsException;
 import org.example.server.mapper.ProjectMapper;
+import org.example.server.mapper.SharedMapper;
 import org.example.server.mapper.UserProjectMapper;
 import org.example.server.model.TokenBlacklist;
 import org.example.server.model.User;
@@ -27,6 +28,10 @@ public class LoginServiceImpl implements LoginService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final UserProjectMapper userProjectMapper;
+    private final ProjectMapper projectMapper;
+    private final SharedMapper sharedMapper;
+
 
     @Override
     public LoginDtoResponse login(LoginDtoRequest loginRequest) {
@@ -49,13 +54,13 @@ public class LoginServiceImpl implements LoginService {
 
         if (user.getCreatedProjects() != null) {
             response.setCreatedProjects(user.getCreatedProjects().stream()
-                    .map(ProjectMapper::ProjectToCreatedProjectsDtoResponse)
+                    .map(sharedMapper::projectToCreatedProjectsDtoResponse)
                     .collect(Collectors.toList()));
         }
 
         if (user.getUserProjects() != null) {
             response.setUserProjects(user.getUserProjects().stream()
-                    .map(UserProjectMapper::mapUserProjectToUserProjectDtoResponse)
+                    .map(userProjectMapper::mapUserProjectToUserProjectDtoResponse)
                     .collect(Collectors.toList()));
         }
 

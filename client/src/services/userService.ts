@@ -3,7 +3,7 @@ import type { UserRequest, UserResponse } from '@/types/interfaces/user';
 
 export const createUser = async (user: UserRequest): Promise<UserResponse> => {
     try {
-        const response = await api.post<UserResponse>('users/register', user);
+        const response = await api.post<UserResponse>('/users/register', user);
         return response.data;
     } catch (error) {
         console.error(error);

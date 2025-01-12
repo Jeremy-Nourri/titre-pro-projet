@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.Optional;
 
 @Service
@@ -21,10 +22,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
     public UserDtoResponse createUser(UserDtoRequest userRequest) {
+        if (userRequest == null) {
+            throw new IllegalArgumentException("UserDtoRequest cannot be null");
+        }
 
         Optional<User> userFound = userRepository.findByEmail(userRequest.getEmail());
 
@@ -32,10 +37,13 @@ public class UserServiceImpl implements UserService {
             throw new EmailExistsException("Email déjà utilisé");
         }
 
-        User user = UserMapper.mapUserDtoRequestToUser(userRequest);
+        User user = userMapper.mapUserDtoRequestToUser(userRequest);
+        if (user == null) {
+            throw new IllegalStateException("UserMapper returned null");
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
-        return UserMapper.mapUserToUserDtoResponse(savedUser);
+        return userMapper.mapUserToUserDtoResponse(savedUser);
     }
 
     @Override
@@ -43,6 +51,6 @@ public class UserServiceImpl implements UserService {
     public UserDtoResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'id : " + id));
-        return UserMapper.mapUserToUserDtoResponse(user);
+        return userMapper.mapUserToUserDtoResponse(user);
     }
 }

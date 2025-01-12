@@ -15,7 +15,6 @@ import org.example.server.model.Project;
 import org.example.server.model.RoleEnum;
 import org.example.server.repository.BoardColumnRepository;
 import org.example.server.repository.ProjectRepository;
-import org.example.server.repository.TaskRepository;
 import org.example.server.service.BoardColumnService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +28,8 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
     private final BoardColumnRepository boardColumnRepository;
     private final ProjectRepository projectRepository;
+    private final BoardColumnMapper boardColumnMapper;
+    private final ProjectMapper projectMapper;
 
     @Override
     @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
@@ -49,7 +50,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
         BoardColumn savedColumn = boardColumnRepository.save(boardColumn);
 
-        return BoardColumnMapper.toResponseDTO(savedColumn);
+        return boardColumnMapper.toResponseDTO(savedColumn);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
         BoardColumn column = boardColumnRepository.findById(columnId)
                 .orElseThrow(() -> new BoardColumnNotFoundException("Column board non trouvée avec l'id : " + columnId));
 
-        return BoardColumnMapper.toResponseDTO(column);
+        return boardColumnMapper.toResponseDTO(column);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
 
         BoardColumn updatedColumn = boardColumnRepository.save(column);
 
-        return BoardColumnMapper.toResponseDTO(updatedColumn);
+        return boardColumnMapper.toResponseDTO(updatedColumn);
     }
 
 
@@ -104,7 +105,7 @@ public class BoardColumnServiceImpl implements BoardColumnService {
         Project projectFound = projectRepository.findByIdWithColumns(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Projet avec ID " + projectId + " non trouvé"));
 
-        return ProjectMapper.ProjectToProjectDtoResponse(projectFound);
+        return projectMapper.projectToProjectDtoResponse(projectFound);
     }
 
 }

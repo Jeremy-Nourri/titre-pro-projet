@@ -3,13 +3,15 @@ package org.example.server.mapper;
 import org.example.server.dto.response.TaskDtoResponse;
 import org.example.server.dto.response.TaskSimplifiedDtoResponse;
 import org.example.server.model.Task;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class TaskMapper {
 
-    public static TaskDtoResponse taskToTaskDtoResponse(Task task) {
+    public TaskDtoResponse taskToTaskDtoResponse(Task task) {
         if (task == null) {
             return null;
         }
@@ -30,27 +32,34 @@ public class TaskMapper {
         return dto;
     }
 
-    public static List<TaskDtoResponse> toTaskDTOList(List<Task> tasks) {
+    public List<TaskDtoResponse> toTaskDTOList(List<Task> tasks) {
+        if (tasks == null) {
+            return List.of();
+        }
         return tasks.stream()
-                .map(TaskMapper::taskToTaskDtoResponse)
+                .map(this::taskToTaskDtoResponse)
                 .collect(Collectors.toList());
     }
 
-    public static TaskSimplifiedDtoResponse toTaskSummaryDTO(Task task) {
+    public TaskSimplifiedDtoResponse toTaskSummaryDTO(Task task) {
         if (task == null) {
             return null;
         }
+
         TaskSimplifiedDtoResponse dto = new TaskSimplifiedDtoResponse();
         dto.setId(task.getId());
         dto.setTitle(task.getTitle());
         dto.setPriority(task.getPriority().name());
+
         return dto;
     }
 
-    public static List<TaskSimplifiedDtoResponse> toTaskSummaryDTOList(List<Task> tasks) {
+    public List<TaskSimplifiedDtoResponse> toTaskSummaryDTOList(List<Task> tasks) {
+        if (tasks == null) {
+            return List.of();
+        }
         return tasks.stream()
-                .map(TaskMapper::toTaskSummaryDTO)
+                .map(this::toTaskSummaryDTO)
                 .collect(Collectors.toList());
     }
-
 }
