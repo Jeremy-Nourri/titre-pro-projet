@@ -3,7 +3,7 @@ import type { LoginRequest, LoginResponse } from '@/types/interfaces/login';
 
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
     try {
-        const response = await api.post<LoginResponse>('login', credentials);
+        const response = await api.post<LoginResponse>('/login', credentials);
         return response.data;
 
     } catch (error) {

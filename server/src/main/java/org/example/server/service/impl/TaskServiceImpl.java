@@ -25,6 +25,8 @@ public class TaskServiceImpl implements TaskService {
 
     private final BoardColumnRepository boardColumnRepository;
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+
 
     @Override
     @CheckProjectAuthorization(roles = {RoleEnum.ADMIN}, isNeedWriteAccess = true)
@@ -49,7 +51,7 @@ public class TaskServiceImpl implements TaskService {
 
         Task taskSaved = taskRepository.save(task);
 
-        return TaskMapper.taskToTaskDtoResponse(taskSaved);
+        return taskMapper.taskToTaskDtoResponse(taskSaved);
     }
 
     @Override
@@ -74,7 +76,7 @@ public class TaskServiceImpl implements TaskService {
         if (request.getTag() != null) existingTask.setTag(request.getTag());
         if (request.getTagColor() != null) existingTask.setTagColor(request.getTagColor());
 
-        return TaskMapper.taskToTaskDtoResponse(existingTask);
+        return taskMapper.taskToTaskDtoResponse(existingTask);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class TaskServiceImpl implements TaskService {
 
         List<Task> tasks = taskRepository.findTasksByBoardColumnId(boardColumnId);
 
-        return TaskMapper.toTaskSummaryDTOList(tasks);
+        return taskMapper.toTaskSummaryDTOList(tasks);
     }
 
     @Override
@@ -110,7 +112,7 @@ public class TaskServiceImpl implements TaskService {
         Task taskFound = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Tâche non trouvée avec ID : " + taskId));
 
-        return TaskMapper.taskToTaskDtoResponse(taskFound);
+        return taskMapper.taskToTaskDtoResponse(taskFound);
     }
 
     @Override
@@ -128,7 +130,7 @@ public class TaskServiceImpl implements TaskService {
 
         Task updatedTask = taskRepository.save(task);
 
-        return TaskMapper.taskToTaskDtoResponse(updatedTask);
+        return taskMapper.taskToTaskDtoResponse(updatedTask);
     }
 
 }
