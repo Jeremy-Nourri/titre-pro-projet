@@ -1,0 +1,54 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test-backend:
+  stage: test
+  image: maven:3.8.5-openjdk-17
+  variables:
+    SPRING_DATASOURCE_URL: $DB_URL
+    SPRING_DATASOURCE_USERNAME: $DB_USERNAME
+    SPRING_DATASOURCE_PASSWORD: $DB_PASSWORD
+    JWT_SECRET: $JWT_SECRET
+    JWT_EXPIRATION: $JWT_EXPIRATION
+  script:
+    - cd server
+    - mvn clean test
+
+test-frontend:
+  stage: test
+  image: node:16
+  script:
+    - cd client
+    - npm install
+    - npm run test
+
+build-backend:
+  stage: build
+  image: maven:3.8.5-openjdk-17
+  script:
+    - cd server
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - server/target/*.jar
+
+build-frontend:
+  stage: build
+  image: node:16
+  variables:
+    VITE_API_URL: $VITE_API_URL
+  script:
+    - cd client
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - client/dist
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose down
+    - docker-compose up -d
