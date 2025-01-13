@@ -16,5 +16,6 @@ public class ServerApplication {
         System.setProperty("JWT_EXPIRATION", dotenv.get("JWT_EXPIRATION"));
 
         SpringApplication.run(ServerApplication.class, args);
+
     }
 }

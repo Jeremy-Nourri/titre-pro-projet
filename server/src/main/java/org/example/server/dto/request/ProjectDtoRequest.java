@@ -13,22 +13,22 @@ import java.time.LocalDate;
 
 public class ProjectDtoRequest {
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 50, message = "Name must not exceed 50 characters")
+    @NotBlank(message = "Le nom est requis")
+    @Size(max = 50, message = "Le nom ne doit pas excédé 50 caractères")
     private String name;
 
-    @Size(max = 500, message = "Description must not exceed 500 characters")
+    @Size(max = 100, message = "La description ne doit pas excédée 100 caractères")
     private String description;
 
-    @NotNull(message = "Start date is required")
-    @PastOrPresent(message = "Start date must be in the past or present")
+    @NotNull(message = "La date de début est requise")
+    @PastOrPresent(message = "La date de début doit être dans le passé ou aujourd'hui")
     private LocalDate startDate;
 
-    @NotNull(message = "End date is required")
-    @Future(message = "End date must be in the future")
+    @NotNull(message = "La date de fin est requise")
+    @Future(message = "La date de fin doit être dans le futur")
     private LocalDate endDate;
 
-    @NotNull(message = "Creator is required")
+    @NotNull(message = "L'id de l'utilisateur est requis")
     private Long createdBy;
 
 }
