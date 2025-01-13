@@ -55,8 +55,17 @@ build-frontend:
 
 deploy:
   stage: deploy
+  image: docker/compose:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo "DB_URL=$DB_URL" > .env
+    - echo "DB_USERNAME=$DB_USERNAME" >> .env
+    - echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker-compose down
+    - docker-compose build
     - docker-compose up -d
   only:
     - main
+
