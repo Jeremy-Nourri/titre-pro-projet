@@ -39,7 +39,7 @@ build-backend:
 
 build-frontend:
   stage: build
-  image: node:16
+  image: node:18
   variables:
     VITE_API_URL: $VITE_API_URL
   script:
