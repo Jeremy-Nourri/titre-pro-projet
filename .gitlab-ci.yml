@@ -3,18 +3,19 @@ stages:
   - build
   - deploy
 
+# --- TEST BACKEND ---
+
 test-backend:
   stage: test
   image: maven:3.8.5-openjdk-17
+  # Ici, on indique explicitement d'utiliser le profil "test" et on injecte JWT_SECRET/EXPIRATION
   variables:
-    SPRING_DATASOURCE_URL: $DB_URL
-    SPRING_DATASOURCE_USERNAME: $DB_USERNAME
-    SPRING_DATASOURCE_PASSWORD: $DB_PASSWORD
-    JWT_SECRET: $JWT_SECRET
-    JWT_EXPIRATION: $JWT_EXPIRATION
+    MAVEN_OPTS: "-Dspring.profiles.active=test -DJWT_SECRET=$JWT_SECRET -DJWT_EXPIRATION=$JWT_EXPIRATION"
   script:
     - cd server
     - mvn clean test
+
+# --- TEST FRONTEND ---
 
 test-frontend:
   stage: test
@@ -24,15 +25,27 @@ test-frontend:
     - npm install
     - npm run test
 
+# --- BUILD BACKEND ---
+
 build-backend:
   stage: build
   image: maven:3.8.5-openjdk-17
+  # Ici, on injecte les variables de prod (MySQL), plus JWT si nécessaire
+  variables:
+    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
   script:
     - cd server
     - mvn clean package -DskipTests
   artifacts:
     paths:
       - server/target/*.jar
+    # Facultatif, vous pouvez définir une durée de conservation des artefacts
+    # expire_in: 1 week
+  # Pour s'assurer que les tests sont passés avant de builder
+  dependencies:
+    - test-backend
+
+# --- BUILD FRONTEND ---
 
 build-frontend:
   stage: build
@@ -46,9 +59,18 @@ build-frontend:
   artifacts:
     paths:
       - client/dist
+    # Facultatif : durée de conservation
+    # expire_in: 1 week
+  # Pour s'assurer que les tests front sont passés avant de builder
+  dependencies:
+    - test-frontend
+
+# --- DEPLOY ---
 
 deploy:
   stage: deploy
   script:
     - docker-compose down
     - docker-compose up -d
+  only:
+    - main

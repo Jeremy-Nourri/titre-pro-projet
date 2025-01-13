@@ -12,7 +12,9 @@ class ServerApplicationTests {
 
     @BeforeAll
     static void setupEnvironment() {
-        Dotenv dotenv = Dotenv.configure().load();
+        Dotenv dotenv = Dotenv.configure()
+                .directory("server")
+                .load();
 
         System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET", "default-secret"));
         System.setProperty("JWT_EXPIRATION", dotenv.get("JWT_EXPIRATION", "3600"));
