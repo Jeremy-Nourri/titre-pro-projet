@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -69,19 +68,14 @@ class UserServiceImplTest {
         UserDtoResponse responseDto = new UserDtoResponse();
         responseDto.setEmail("test@example.com");
 
-        // On simule que l'email n'existe pas déjà :
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
-        // On simule l'encodage du password :
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-        // On moque la conversion UserDtoRequest -> User :
         when(userMapper.mapUserDtoRequestToUser(any(UserDtoRequest.class))).thenReturn(user);
 
-        // On moque la conversion User -> UserDtoResponse :
         when(userMapper.mapUserToUserDtoResponse(any(User.class))).thenReturn(responseDto);
 
-        // On simule la sauvegarde en base :
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         UserDtoResponse response = userService.createUser(request);

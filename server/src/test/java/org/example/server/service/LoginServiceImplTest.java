@@ -20,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -118,9 +117,6 @@ class LoginServiceImplTest {
         verify(passwordEncoder).matches("password", "encodedPassword");
         verify(jwtTokenUtil).generateToken("test@example.com", 1L);
     }
-
-
-
 
     @Test
     void testLogin_InvalidEmail() {
