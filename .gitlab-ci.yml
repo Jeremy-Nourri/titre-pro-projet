@@ -60,9 +60,9 @@ build-frontend:
 
 deploy:
   stage: deploy
-  image: docker:20.10.24 # Remplacez `docker/compose:latest` par une version stable de Docker
+  image: docker:20.10.24
   services:
-    - docker:dind # Utilisation correcte de Docker-in-Docker
+    - docker:dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
