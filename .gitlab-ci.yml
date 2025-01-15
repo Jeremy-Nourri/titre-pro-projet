@@ -68,11 +68,11 @@ deploy:
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - echo "DB_URL=$DB_URL" > .env
-    - echo "DB_USERNAME=$DB_USERNAME" >> .env
-    - echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-    - echo "JWT_SECRET=$JWT_SECRET" >> .env
-    - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
+    # - echo "DB_URL=$DB_URL" > .env
+    # - echo "DB_USERNAME=$DB_USERNAME" >> .env
+    # - echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+    # - echo "JWT_SECRET=$JWT_SECRET" >> .env
+    # - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
   script:
     - docker-compose -f docker-compose.yml down --remove-orphans
     - docker-compose -f docker-compose.yml up -d
