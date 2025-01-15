@@ -1,16 +1,10 @@
-# Définir la version de Docker Compose
 version: '3.8'
 
-# Définir les services
 services:
-
   server:
-    build:
-      # Définir le contexte du Dockerfile
-      context: ./server
+    image: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
     ports:
       - "8080:8080"
-      # Définir le réseau permettant la communication entre les services
     networks:
       - app-network
     environment:
@@ -23,8 +17,7 @@ services:
       - client
 
   client:
-    build:
-      context: ./client
+    image: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
     ports:
       - "3000:80"
     networks:

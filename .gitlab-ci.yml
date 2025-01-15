@@ -1,7 +1,17 @@
 stages:
   - test
   - build
+  - docker_build
   - deploy
+
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"
+  DOCKER_IMAGE_TAG: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+cache:
+  paths:
+    - server/.m2/repository
+    - client/node_modules
 
 test-backend:
   stage: test
@@ -15,30 +25,36 @@ test-backend:
     - echo "JWT_SECRET=$JWT_SECRET" >> server/.env
     - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> server/.env
     - cd server
-    - mvn clean test
+    - mvn $MAVEN_CLI_OPTS clean test
+  artifacts:
+    paths:
+      - server/.env
+    expire_in: 1 hour
 
 test-frontend:
   stage: test
   image: node:18
   script:
     - cd client
-    - npm install
+    - npm ci
     - npm run test
-
+  artifacts:
+    paths:
+      - client/.env
+    expire_in: 1 hour
 
 build-backend:
   stage: build
   image: maven:3.8.5-openjdk-17
-
   variables:
     MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
   script:
     - cd server
-    - mvn clean package -DskipTests
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
   artifacts:
     paths:
       - server/target/*.jar
-
+    expire_in: 1 day
   dependencies:
     - test-backend
 
@@ -49,14 +65,36 @@ build-frontend:
     VITE_API_URL: $VITE_API_URL
   script:
     - cd client
-    - npm install
+    - npm ci
     - npm run build
   artifacts:
     paths:
       - client/dist
-
+    expire_in: 1 day
   dependencies:
     - test-frontend
+
+docker_build:
+  stage: docker_build
+  image: docker:20.10.24
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -f server/Dockerfile .
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -f client/Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
+  dependencies:
+    - build-backend
+    - build-frontend
+  only:
+    - main
 
 deploy:
   stage: deploy
@@ -67,15 +105,10 @@ deploy:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    # - echo "DB_URL=$DB_URL" > .env
-    # - echo "DB_USERNAME=$DB_USERNAME" >> .env
-    # - echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-    # - echo "JWT_SECRET=$JWT_SECRET" >> .env
-    # - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - docker-compose -f docker-compose.yml down --remove-orphans
-    - docker-compose -f docker-compose.yml up -d
+    - docker-compose -f docker-compose.yml pull
+    - docker-compose -f docker-compose.yml up -d --remove-orphans
     - docker ps -a
   only:
     - main

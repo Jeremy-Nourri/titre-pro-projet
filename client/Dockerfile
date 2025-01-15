@@ -1,23 +1,15 @@
-# Étape 1 : Construire l'application avec Node.js
-
-# Utiliser l'image Node.js 18 comme image de base
+# Étape 1 : Construction de l'application
 FROM node:18 AS builder
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de configuration nécessaires
-COPY package.json package-lock.json* ./
+# Copier les fichiers de configuration et installer les dépendances
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Installer les dépendances
-RUN npm install
-
-# Copier le reste des fichiers de l'application
+# Copier le reste des fichiers et construire l'application
 COPY . .
-
-# Construire l'application pour la production
 RUN npm run build
-
 
 # Étape 2 : Servir l'application avec Nginx
 FROM nginx:alpine
@@ -25,7 +17,7 @@ FROM nginx:alpine
 # Copier les fichiers construits dans le répertoire par défaut de Nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Exposer le port 80 pour le serveur
+# Exposer le port 80
 EXPOSE 80
 
 # Commande de démarrage de Nginx
