@@ -25,46 +25,36 @@ test-frontend:
     - npm install
     - npm run test
 
+
 build-backend:
   stage: build
-  image: docker:20.10.16
-  services:
-    - docker:dind
+  image: maven:3.8.5-openjdk-17
+
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
   script:
     - cd server
     - mvn clean package -DskipTests
-    - docker build -t $CI_REGISTRY_IMAGE/backend:latest .
-    - docker push $CI_REGISTRY_IMAGE/backend:latest
   artifacts:
     paths:
       - server/target/*.jar
+
   dependencies:
     - test-backend
 
 build-frontend:
   stage: build
-  image: docker:20.10.16
-  services:
-    - docker:dind
+  image: node:18
   variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    VITE_API_URL: $VITE_API_URL
   script:
     - cd client
     - npm install
     - npm run build
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:latest .
-    - docker push $CI_REGISTRY_IMAGE/frontend:latest
   artifacts:
     paths:
       - client/dist
+
   dependencies:
     - test-frontend
 
@@ -72,7 +62,7 @@ deploy:
   stage: deploy
   image: docker/compose:latest
   services:
-    - docker:dind
+    - docker:din
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -84,10 +74,8 @@ deploy:
     - echo "JWT_SECRET=$JWT_SECRET" >> .env
     - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
   script:
-    - docker-compose down --remove-orphans
-    - docker-compose pull  # Récupère les images depuis le registre GitLab
+    # - docker-compose down --remove-orphans
     - docker-compose up -d
     - docker ps -a
   only:
     - main
-
