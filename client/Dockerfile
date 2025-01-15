@@ -1,6 +1,9 @@
 # Étape 1 : Construire l'application avec Node.js
+
+# Utiliser l'image Node.js 18 comme image de base
 FROM node:18 AS builder
 
+# Définir le répertoire de travail
 WORKDIR /app
 
 # Copier les fichiers de configuration nécessaires
@@ -14,6 +17,7 @@ COPY . .
 
 # Construire l'application pour la production
 RUN npm run build
+
 
 # Étape 2 : Servir l'application avec Nginx
 FROM nginx:alpine

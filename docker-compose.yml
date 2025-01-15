@@ -1,11 +1,16 @@
+# Définir la version de Docker Compose
 version: '3.8'
 
+# Définir les services
 services:
+
   server:
     build:
+      # Définir le contexte du Dockerfile
       context: ./server
     ports:
-      - "8081:8080"
+      - "8080:8080"
+      # Définir le réseau permettant la communication entre les services
     networks:
       - app-network
     environment:
