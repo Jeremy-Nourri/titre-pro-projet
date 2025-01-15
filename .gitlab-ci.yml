@@ -7,8 +7,13 @@ test-backend:
   stage: test
   image: maven:3.8.5-openjdk-17
   variables:
-    MAVEN_OPTS: "-Dspring.profiles.active=test -DJWT_SECRET=$JWT_SECRET -DJWT_EXPIRATION=$JWT_EXPIRATION"
+    MAVEN_OPTS: "-Dspring.profiles.active=test"
   script:
+    - echo "DB_URL=$DB_URL" > server/.env
+    - echo "DB_USERNAME=$DB_USERNAME" >> server/.env
+    - echo "DB_PASSWORD=$DB_PASSWORD" >> server/.env
+    - echo "JWT_SECRET=$JWT_SECRET" >> server/.env
+    - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> server/.env
     - cd server
     - mvn clean test
 
