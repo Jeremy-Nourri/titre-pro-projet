@@ -9,11 +9,6 @@ variables:
   DOCKER_IMAGE_TAG_BACKEND: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA"
   DOCKER_IMAGE_TAG_FRONTEND: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
 
-cache:
-  paths:
-    - server/.m2/repository
-    - client/node_modules
-
 # Étape de test pour le backend
 test-backend:
   stage: test
@@ -28,7 +23,6 @@ test-backend:
     - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> server/.env
     - cd server
     - mvn $MAVEN_CLI_OPTS clean test
-    - ls -la server/.m2/repository
   artifacts:
     paths:
       - server/.env
@@ -42,7 +36,6 @@ test-frontend:
     - cd client
     - npm ci
     - npm run test
-    - ls -la client/node_modules
   artifacts:
     paths:
       - client/.env
@@ -57,7 +50,6 @@ build-backend:
   script:
     - cd server
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-    - ls -la server/.m2/repository
   artifacts:
     paths:
       - server/target/*.jar
@@ -75,7 +67,7 @@ build-frontend:
     - cd client
     - npm ci
     - npm run build
-    - ls -la client/dist
+
   artifacts:
     paths:
       - client/dist
