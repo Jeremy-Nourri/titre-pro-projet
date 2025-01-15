@@ -60,9 +60,9 @@ build-frontend:
 
 deploy:
   stage: deploy
-  image: docker/compose:latest
+  image: docker:20.10.24 # Remplacez `docker/compose:latest` par une version stable de Docker
   services:
-    - docker:din
+    - docker:dind # Utilisation correcte de Docker-in-Docker
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -74,8 +74,8 @@ deploy:
     - echo "JWT_SECRET=$JWT_SECRET" >> .env
     - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> .env
   script:
-    # - docker-compose down --remove-orphans
-    - docker-compose up -d
+    - docker-compose -f docker-compose.yml down --remove-orphans
+    - docker-compose -f docker-compose.yml up -d
     - docker ps -a
   only:
     - main
