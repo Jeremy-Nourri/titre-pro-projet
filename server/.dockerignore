@@ -1,0 +1,7 @@
+*.log
+*.tmp
+
+.m2/repository/
+
+*.idea/
+*.vscode/

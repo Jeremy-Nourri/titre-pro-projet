@@ -5,19 +5,21 @@ stages:
   - deploy
 
 variables:
-  MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress"
-  DOCKER_IMAGE_TAG: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+  MAVEN_CLI_OPTS: "--batch-mode --no-transfer-progress -Dmaven.repo.local=server/.m2/repository"
+  DOCKER_IMAGE_TAG_BACKEND: "$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA"
+  DOCKER_IMAGE_TAG_FRONTEND: "$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA"
 
 cache:
   paths:
     - server/.m2/repository
     - client/node_modules
 
+# Étape de test pour le backend
 test-backend:
   stage: test
   image: maven:3.8.5-openjdk-17
   variables:
-    MAVEN_OPTS: "-Dspring.profiles.active=test"
+    MAVEN_OPTS: "-Dspring.profiles.active=test -Dmaven.repo.local=server/.m2/repository"
   script:
     - echo "DB_URL=$DB_URL" > server/.env
     - echo "DB_USERNAME=$DB_USERNAME" >> server/.env
@@ -26,11 +28,13 @@ test-backend:
     - echo "JWT_EXPIRATION=$JWT_EXPIRATION" >> server/.env
     - cd server
     - mvn $MAVEN_CLI_OPTS clean test
+    - ls -la server/.m2/repository
   artifacts:
     paths:
       - server/.env
     expire_in: 1 hour
 
+# Étape de test pour le frontend
 test-frontend:
   stage: test
   image: node:18
@@ -38,19 +42,22 @@ test-frontend:
     - cd client
     - npm ci
     - npm run test
+    - ls -la client/node_modules
   artifacts:
     paths:
       - client/.env
     expire_in: 1 hour
 
+# Étape de build pour le backend
 build-backend:
   stage: build
   image: maven:3.8.5-openjdk-17
   variables:
-    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
+    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION -Dmaven.repo.local=server/.m2/repository"
   script:
     - cd server
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+    - ls -la server/.m2/repository
   artifacts:
     paths:
       - server/target/*.jar
@@ -58,6 +65,7 @@ build-backend:
   dependencies:
     - test-backend
 
+# Étape de build pour le frontend
 build-frontend:
   stage: build
   image: node:18
@@ -67,6 +75,7 @@ build-frontend:
     - cd client
     - npm ci
     - npm run build
+    - ls -la client/dist
   artifacts:
     paths:
       - client/dist
@@ -74,6 +83,7 @@ build-frontend:
   dependencies:
     - test-frontend
 
+# Étape de construction des images Docker
 docker_build:
   stage: docker_build
   image: docker:20.10.24
@@ -82,20 +92,23 @@ docker_build:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    MAVEN_OPTS: "-Dspring.datasource.url=$DB_URL -Dspring.datasource.username=$DB_USERNAME -Dspring.datasource.password=$DB_PASSWORD -Djwt.secret=$JWT_SECRET -Djwt.expiration=$JWT_EXPIRATION"
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -f server/Dockerfile server/
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -f client/Dockerfile client/
-    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
+    # Construire l'image backend avec le contexte correct
+    - docker build -t $DOCKER_IMAGE_TAG_BACKEND -f server/Dockerfile server/
+    # Construire l'image frontend avec le contexte correct
+    - docker build -t $DOCKER_IMAGE_TAG_FRONTEND -f client/Dockerfile client/
+    # Pousser les images vers le registre
+    - docker push $DOCKER_IMAGE_TAG_BACKEND
+    - docker push $DOCKER_IMAGE_TAG_FRONTEND
   dependencies:
     - build-backend
     - build-frontend
   only:
     - main
 
+# Étape de déploiement
 deploy:
   stage: deploy
   image: docker:20.10.24

@@ -1,7 +1,11 @@
 version: '3.8'
 
 services:
+
   server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     image: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
     ports:
       - "8080:8080"
@@ -13,10 +17,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
-    depends_on:
-      - client
 
   client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
     image: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
     ports:
       - "3000:80"
