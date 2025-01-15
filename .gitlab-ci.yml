@@ -86,8 +86,8 @@ docker_build:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -f server/Dockerfile .
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -f client/Dockerfile .
+docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -f server/Dockerfile server/
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -f client/Dockerfile client/
     - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
   dependencies:
