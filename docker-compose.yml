@@ -9,12 +9,14 @@ services:
     networks:
       - app-network
     environment:
-      - DB_URL=${DB_URL}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    depends_on:
+      - client
+
   client:
     build:
       context: ./client
@@ -22,8 +24,8 @@ services:
       - "3000:80"
     networks:
       - app-network
-    env_file:
-      - .env
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
 
 networks:
   app-network:
