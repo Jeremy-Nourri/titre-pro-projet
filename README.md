@@ -31,6 +31,10 @@
    - Le backend est packagé en un fichier `.jar`.
    - Le frontend est construit et les fichiers statiques sont générés.
 
+3. **Docker_Build**
+- Construction des images Docker pour le backend et le frontend.
+- Les images sont taguées et poussées vers le registre Docker de GitLab.
+
 3. **Déploiement** :
    - Les services Docker sont démarrés avec Docker Compose.
 
