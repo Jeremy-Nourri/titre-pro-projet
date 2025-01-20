@@ -7,10 +7,12 @@ import { useRoute } from 'vue-router';
 import FormInput from '@/components/ui/FormInput.vue';
 import BoardColumn from '@/components/BoardColumn.vue';
 import ReusableModal from '@/components/ui/ReusableModal.vue';
+import Toast from '@/components/ui/ToastNotifcation.vue';
 import AddUserInProjectForm from '@/components/AddUserInProjectForm.vue';
 import { PlusCircleIcon } from '@heroicons/vue/20/solid'
 import type { BoardColumnRequest } from '@/types/interfaces/boardColumn';
 import type { UserProjectRequest } from '@/types/interfaces/userProject';
+
 
 const projectStore = useProjectStore();
 
@@ -157,6 +159,14 @@ const handleSubmitAddUser = async (userProject: UserProjectRequest) => {
                 </template>
             </ReusableModal>
         </div>
+
+        <Toast
+            v-if="messageResponse"
+            :message="messageResponse"
+            type="success"
+            :duration="3000"
+        /> 
+
         <ReusableModal v-if="projectStore.projectState?.id" v-model="showAddUserForm" >
             <AddUserInProjectForm
                 :project-id="projectStore.projectState?.id"
